@@ -11,6 +11,8 @@ More information can be found on <a href="https://docs.microsoft.com/en-us/azure
 
 This Azure automation script will read the routes injected via BGP from the ExpressRoute provider and create User Defined Routes. It is required to setup an Azure Automation account. To setup the Azure Automation Account and the script you need to follow these steps:
 
+The number of routes per User Defined Route table is by default 100. If you need more entries this is possible by contacting Microsoft support. Limitations are listed on <a href="https://docs.microsoft.com/en-us/azure/azure-subscription-service-limits">this link</a>.
+
 <ol>
     <li>Login into the Azure Portal</li>
     <li>Go to the Azure Marketplace and search for Azure Automation <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation1.png"/></li>

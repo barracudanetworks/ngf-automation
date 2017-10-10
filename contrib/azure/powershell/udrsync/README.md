@@ -14,7 +14,7 @@ This Azure automation script will read the routes injected via BGP from the Expr
 <ol>
     <li>Login into the Azure Portal</li>
     <li>Go to the Azure Marketplace and search for Azure Automation <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation1.png"/></li>
-    <li>Create the Azure Automation account and automatically create the "Azure Run As account" <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation2.jpg"/></li>
-    <li>Upgrade and/or install any addtional modules as indicated in the script <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation3.jpg"/></li>
-    <li>Create a Runbook and import the powershell script <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation4.jpg"/></li>
+    <li>Create the Azure Automation account and automatically create the "Azure Run As account" <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation2.png"/></li>
+    <li>Upgrade and/or install any addtional modules as indicated in the script <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation3.png"/></li>
+    <li>Create a Runbook and import the powershell script <img src="../../../../../../raw/master/contrib/azure/powershell/udrsync/cudaautomation4.png"/></li>
 </ol>

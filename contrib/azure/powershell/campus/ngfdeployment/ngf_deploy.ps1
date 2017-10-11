@@ -79,9 +79,10 @@ Login-AzureRmAccount
 Write-Verbose ('Creating NGF Resource Group {0}' -f $NGFresourceGroupName)
 New-AzureRmResourceGroup -Name $NGFresourceGroupName -Location $location -ErrorAction Stop
 
-
+if(!$useManagedDisks){
 # Use existing storage account
-$storageAccount = Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroupName
+  $storageAccount = Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroupName
+}
 
 # Use an existing Virtual Network
 Write-Verbose ('Using VNET {0} in Resource Group {1}' -f $vnetNamem,$vnetResourceGroupName )
@@ -151,7 +152,7 @@ if(!$useManagedDisks){
 # Specify the OS disk with user image
 if ($customSourceImageUri -eq '')
 {
-    Write-Verbose 'Using lasted image from the Azure Marketplace'
+    Write-Verbose 'Using lastest image from the Azure Marketplace'
     $vm.Plan = @{'name'= $vmLicenseType; 'publisher'= 'barracudanetworks'; 'product' = $vmProductType}
     $vm = Set-AzureRmVMSourceImage -VM $vm -PublisherName 'barracudanetworks' -Skus $vmLicenseType -Offer $vmProductType -Version 'latest' -ErrorAction Stop
 

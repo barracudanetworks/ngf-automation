@@ -25,3 +25,5 @@ To retrieve Shared Access Signature you need access to the Azure Portal.
     <li>Go to the 'Shared Access Signature' option and create the token. The minimal requirements are Access to Blob, Allow Object resource type and the persmission to Add and Create.<img src="../../../../../raw/master/contrib/general/ngf-backup/images/sharedaccesssignature.png"/></li>
     <li>Copy the SAS token start with '?sv=' in the variable in the backup script.</li>
 </ol>
+
+##### DISCLAIMER: ALL OF THE SOURCE CODE ON THIS REPOSITORY IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL BARRACUDA BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOURCE CODE. #####

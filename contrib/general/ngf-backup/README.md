@@ -22,6 +22,6 @@ To retrieve Shared Access Signature you need access to the Azure Portal.
     <li>Login into the Azure Portal</li>
     <li>Create or access the Azure Storage Account you want to use for your the backup</li>
     <li>Create a new container that will be hold the backup</li>
-    <li>Go to the 'Shared Access Signature' option and create the token. The minimal requirements are Access to Blob, Allow Object resource type and the persmission to Add and Create.<img src="../../../../../../raw/master/contrib/general/ngf-backup/images/sharedaccesssignature.png"/></li>
+    <li>Go to the 'Shared Access Signature' option and create the token. The minimal requirements are Access to Blob, Allow Object resource type and the persmission to Add and Create.<img src="../../../../../raw/master/contrib/general/ngf-backup/images/sharedaccesssignature.png"/></li>
     <li>Copy the SAS token start with '?sv=' in the variable in the backup script.</li>
 </ol>

@@ -9,6 +9,9 @@
 # Backup script for the Barracuda NextGen Firewall F-Series.
 # The backup destination is an Azure Blob Storage Container.
 #
+# AUTHOR: Joeri Van Hoof (jvanhoof@barracuda.com)
+# LASTEDIT: 06 November 2017
+#
 ##############################################################################################################
 # Based on this script: https://github.com/fabianfabian/blobize.sh/blob/master/blobize.sh
 # Azure Storage Documentation: https://docs.microsoft.com/en-us/rest/api/storageservices/Authentication-for-the-Azure-Storage-Services?redirectedfrom=MSDN

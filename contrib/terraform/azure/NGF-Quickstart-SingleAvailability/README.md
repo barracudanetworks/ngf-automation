@@ -52,3 +52,10 @@ Alternatively these credentials can be provided using when launching terraform a
 The package provides a deploy.sh and deploy-docker.sh script. The deploy.sh can be used when Terraform is installed localy. The deploy-docker.sh will deploy using Terraform available in a docker image. Terraform is also available in the Azure Cloud Shell. 
 
 To delete the whole deployment you can use the destroy.sh or destroy-docker.sh script.
+
+## Azure CLI test
+
+```azurecli-interactive
+az login
+
+```

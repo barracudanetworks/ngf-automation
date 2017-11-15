@@ -61,6 +61,7 @@ $datadiskName2 = 'datadisk2'
 $datadiskName3 = 'datadisk3'
 # size of a single data disk size in GB. Multiply the size by the number of disks to received the total disk size of the RAID device
 $datadisksize = 40
+#If using managed disk this must be defined for the storage type e.g StandardLRS, PremiumLRS
 $storageType = ""
 
 

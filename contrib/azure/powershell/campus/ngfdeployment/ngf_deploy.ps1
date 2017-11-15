@@ -33,6 +33,11 @@ $vmProductType ='barracuda-ng-firewall' # Use 'barracuda-ng-firewall' for F-Seri
 #Run the following to see the other image offers available.
 #Get-AzureRmVMImageOffer -PublisherName "barracudanetworks" -Location "$($location)"
 
+#Set the version to be deployed #latest
+$vmVersion = 'latest'
+#You can review the versions available using the below command
+#Get-AzureRmVMImage -Location $location -PublisherName "barracudanetworks" -Offer $vmProductType -Skus $vmLicenseType
+
 
 # VNET
 $vnetName = 'your_virtual_network_name'
@@ -80,12 +85,13 @@ Login-AzureRmAccount
 Write-Verbose ('Creating NGF Resource Group {0}' -f $NGFresourceGroupName)
 New-AzureRmResourceGroup -Name $NGFresourceGroupName -Location $location -ErrorAction Stop
 
-
+if(!$useManagedDisks){
 # Use existing storage account
-$storageAccount = Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroupName
+  $storageAccount = Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroupName
+}
 
 # Use an existing Virtual Network
-Write-Verbose ('Using VNET {0} in Resource Group {1}' -f $vnetNamem,$vnetResourceGroupName )
+Write-Verbose ('Using VNET {0} in Resource Group {1}' -f $vnetName,$vnetResourceGroupName )
 $vnet = Get-AzureRmVirtualNetwork -Name $vnetName -ResourceGroupName $vnetResourceGroupName
 
 #If the useManagedDisks variable is set to $true then this will switch the command required.
@@ -154,7 +160,7 @@ if ($customSourceImageUri -eq '')
 {
     Write-Verbose 'Using lasted image from the Azure Marketplace'
     $vm.Plan = @{'name'= $vmLicenseType; 'publisher'= 'barracudanetworks'; 'product' = $vmProductType}
-    $vm = Set-AzureRmVMSourceImage -VM $vm -PublisherName 'barracudanetworks' -Skus $vmLicenseType -Offer $vmProductType -Version 'latest' -ErrorAction Stop
+    $vm = Set-AzureRmVMSourceImage -VM $vm -PublisherName 'barracudanetworks' -Skus $vmLicenseType -Offer $vmProductType -Version $vmVersion -ErrorAction Stop
 
     #
     if($useManagedDisks){

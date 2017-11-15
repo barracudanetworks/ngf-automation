@@ -99,19 +99,19 @@ resource "azurerm_virtual_machine" "ngfvm" {
   location              = "${azurerm_resource_group.resourcegroup.location}"
   resource_group_name   = "${azurerm_resource_group.resourcegroup.name}"
   network_interface_ids = ["${azurerm_network_interface.ngfifc.id}"]
-  vm_size               = "${var.vmsize}"
+  vm_size               = "${var.ngf_vmsize}"
 
   storage_image_reference {
     publisher = "barracudanetworks"
     offer     = "barracuda-ng-firewall"
-    sku       = "${var.imagesku}"
+    sku       = "${var.ngf_imagesku}"
     version   = "latest"
   }
 
   plan {
     publisher = "barracudanetworks"
     product   = "barracuda-ng-firewall"
-    name      = "byol"
+    name      = "${var.ngf_vmsize}"
   }
 
   storage_os_disk {

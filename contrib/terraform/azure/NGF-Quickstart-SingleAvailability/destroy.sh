@@ -7,7 +7,7 @@ cat << "EOF"
 # | |_) | (_| | |  | | | (_| | (__| |_| | (_| | (_| |
 # |____/ \__,_|_|  |_|  \__,_|\___|\__,_|\__,_|\__,_|
 #                                                    
-# Deployment of CUDALAB EU configuration in Microsoft Azure using Terraform and Ansible
+# Deployment of the Barracuda NextGen Firewall F-Series in Single Availability using Terraform
 #
 ##############################################################################################################
 EOF

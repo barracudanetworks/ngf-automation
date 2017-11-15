@@ -28,13 +28,13 @@ variable "prefix" {
     default     = "JVH16"
 }
 
-variable "imagesku" {
+variable "ngf_imagesku" {
     description = "SKU Hourly (PAYG) or Bring your own license (BYOL)"
     default     = "byol"
 }
 
-variable "vmsize" {
-    description = "Size of the VMs to be created"
+variable "ngf_vmsize" {
+    description = "Size of the Barracuda NGF VMs to be created"
     default     = "Standard_DS1_v2"
 }
 
@@ -59,7 +59,7 @@ variable "subnet_backend" {
 }
 
 variable "ngf_ipaddress" {
-    description = ""
+    description = "Private IP address of the Barracuda NGF VM"
     default = "172.16.136.10"
 }
 

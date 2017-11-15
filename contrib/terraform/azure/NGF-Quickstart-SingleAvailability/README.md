@@ -1,7 +1,5 @@
 # Barracuda Next Gen Firewall F Series Quick Start Single Availability
 
-![Build status](https://img.shields.io/vso/build/cudajvhoof/19118fdb-7d82-4c41-a1fd-b16e490dc968/4.svg)
-
 ## Introduction
 This HashiCorp Terraform template deploy the Barracuda Next Gen Firewall F Series in a new VNET. Deployment is done with in a one-armed fashion where north-south, east-west and VPN tunnel traffic can be intercepted and inspected based on the User Defined Routing that is attached to the subnets that need this control. Do not apply any UDR to the subnet where the NGF is located that points back to the NGF. This will cause routing loops.
 
@@ -52,10 +50,3 @@ Alternatively these credentials can be provided using when launching terraform a
 The package provides a deploy.sh and deploy-docker.sh script. The deploy.sh can be used when Terraform is installed localy. The deploy-docker.sh will deploy using Terraform available in a docker image. Terraform is also available in the Azure Cloud Shell. 
 
 To delete the whole deployment you can use the destroy.sh or destroy-docker.sh script.
-
-## Azure CLI test
-
-```azurecli-interactive
-az login
-
-```

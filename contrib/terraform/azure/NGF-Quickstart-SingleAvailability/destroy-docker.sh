@@ -7,7 +7,7 @@ cat << "EOF"
 # | |_) | (_| | |  | | | (_| | (__| |_| | (_| | (_| |
 # |____/ \__,_|_|  |_|  \__,_|\___|\__,_|\__,_|\__,_|
 #                                                    
-# Deployment of CUDALAB EU configuration in Microsoft Azure using Terraform and Ansible
+# Deployment of the Barracuda NextGen Firewall F-Series in Single Availability using Terraform
 #
 ##############################################################################################################
 EOF
@@ -15,10 +15,10 @@ EOF
 # Stop running when command returns error
 set -e
 
-SECRET="/ssh/cudalab/secrets.tfvars"
+SECRET="/ssh/secrets.tfvars"
 STATE="/data/state/terraform.tfstate"
 
 echo "==> Terraform destroy"
 echo ""
-docker run --rm -itv $PWD:/data -v terraform-run:/.terraform/ -v ~/.ssh:/ssh/ jvhoof/ansible-docker \
+docker run --rm -itv $PWD:/data -v $PWD/terraform-run:/.terraform/ -v ~/.ssh:/ssh/ jvhoof/ansible-docker \
     terraform destroy --state="$STATE" -var-file="$SECRET" /data/terraform

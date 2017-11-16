@@ -12,23 +12,35 @@ cat << "EOF"
 ##############################################################################################################
 EOF
 
+STATE="state/terraform.tfstate"
+
+# Input prefix 
+echo -n "Enter prefix: "
+stty_orig=`stty -g` # save original terminal setting.
+read prefix         # read the password
+stty $stty_orig     # restore terminal setting.
+
+# Input password 
+echo -n "Enter password: "
+stty_orig=`stty -g` # save original terminal setting.
+stty -echo          # turn-off echoing.
+read passwd         # read the password
+stty $stty_orig     # restore terminal setting.
+
 # Stop running when command returns error
 set -e
-
-SECRET="~/.ssh/secrets.tfvars"
-STATE="/data/state/terraform.tfstate"
 
 echo ""
 echo "==> Terraform init"
 echo ""
-terraform init -var-file="$SECRET" 
+terraform init -var "prefix=$prefix" -var "password=$password"
 
 echo ""
 echo "==> Terraform plan"
 echo ""
-terraform plan -state="$STATE" -var-file="$SECRET"
+terraform plan -state="$STATE" -var "prefix=$prefix" -var "password=$password"
 
 echo ""
 echo "==> Terraform apply"
 echo ""
-terraform apply -state="$STATE" -var-file="$SECRET"
+terraform apply -state="$STATE" -var "prefix=$prefix" -var "password=$password"

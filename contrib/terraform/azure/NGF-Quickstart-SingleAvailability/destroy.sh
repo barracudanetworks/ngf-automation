@@ -15,9 +15,8 @@ EOF
 # Stop running when command returns error
 set -e
 
-SECRET="~/.ssh/secrets.tfvars"
 STATE="state/terraform.tfstate"
 
 echo "==> Terraform destroy"
 echo ""
-terraform destroy --state="$STATE" -var-file="$SECRET" 
+terraform destroy --state="$STATE"

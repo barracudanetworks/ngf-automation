@@ -24,7 +24,7 @@ stty $stty_orig     # restore terminal setting.
 echo -n "Enter password: "
 stty_orig=`stty -g` # save original terminal setting.
 stty -echo          # turn-off echoing.
-read passwd         # read the password
+read password         # read the password
 stty $stty_orig     # restore terminal setting.
 
 # Stop running when command returns error

@@ -4,18 +4,22 @@ variable "password" {
 
 variable "tenant_id" { 
     description = "The Azure RM tenant ID to use"
+    default = ""
 }
 
 variable "subscription_id" { 
     description = "The Azure RM subscription ID to use"
+    default = ""
 }
 
 variable "client_id" { 
     description = "The Azure RM client ID to use"
+    default = ""
 }
 
 variable "client_secret" { 
     description = "The Azure RM client secret to use"
+    default = ""
 }
 
 variable "location" {
@@ -25,7 +29,7 @@ variable "location" {
 
 variable "prefix" {
     description = "The shortened abbreviation to represent your resource group that will go on the front of some resources."
-    default     = "JVH16"
+    default     = "CUDADEVOPS"
 }
 
 variable "ngf_imagesku" {

@@ -111,7 +111,7 @@ resource "azurerm_virtual_machine" "ngfvm" {
   plan {
     publisher = "barracudanetworks"
     product   = "barracuda-ng-firewall"
-    name      = "${var.ngf_vmsize}"
+    name      = "${var.ngf_imagesku}"
   }
 
   storage_os_disk {

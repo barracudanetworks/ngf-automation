@@ -33,14 +33,14 @@ set -e
 echo ""
 echo "==> Terraform init"
 echo ""
-terraform init -var "prefix=$prefix" -var "password=$password" terraform/
+terraform init -var "prefix=$prefix" -var "password=$password" $1
 
 echo ""
 echo "==> Terraform plan"
 echo ""
-terraform plan -state="$STATE" -var "prefix=$prefix" -var "password=$password" terraform/
+terraform plan -state="$STATE" -var "prefix=$prefix" -var "password=$password" $1
 
 echo ""
 echo "==> Terraform apply"
 echo ""
-terraform apply -state="$STATE" -var "prefix=$prefix" -var "password=$password" terraform/
+terraform apply -state="$STATE" -var "prefix=$prefix" -var "password=$password" $1

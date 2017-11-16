@@ -31,7 +31,7 @@ stty $stty_orig     # restore terminal setting.
 set -e
 
 echo ""
-echo "==> Terraform init"
+echo "==> Terraform init: $1"
 echo ""
 terraform init -var "prefix=$prefix" -var "password=$password" $1
 

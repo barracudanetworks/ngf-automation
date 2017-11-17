@@ -12,10 +12,6 @@ cat << "EOF"
 ##############################################################################################################
 EOF
 
-# Stop running when command returns error
-set -e
-
-SECRET="~/.ssh/secrets.tfvars"
 STATE="state/terraform.tfstate"
 
 TF_INIT="terreaform-run"
@@ -24,17 +20,27 @@ then
     mkdir -p $TF_INIT
 fi 
 
+# Input password 
+echo -n "Enter password: "
+stty_orig=`stty -g` # save original terminal setting.
+stty -echo          # turn-off echoing.
+read password       # read the password
+stty $stty_orig     # restore terminal setting.
+
+# Stop running when command returns error
+set -e
+
 echo ""
 echo "==> Terraform init"
 echo ""
-terraform init -var-file="$SECRET" terraform/
+terraform init -var "password=$password" terraform/
 
 echo ""
 echo "==> Terraform plan"
 echo ""
-terraform plan -state="$STATE" -var-file="$SECRET" terraform/
+terraform plan -state="$STATE" -var "password=$password" terraform/
 
 echo ""
 echo "==> Terraform apply"
 echo ""
-terraform apply -state="$STATE" -var-file="$SECRET" terraform/
+terraform apply -state="$STATE" -var "password=$password" terraform/

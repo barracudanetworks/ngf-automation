@@ -14,6 +14,12 @@ EOF
 
 STATE="state/terraform.tfstate"
 
+TF_INIT="terreaform-run"
+if [ ! -d $TF_INIT ] 
+then
+    mkdir -p $TF_INIT
+fi 
+
 # Input password 
 echo -n "Enter password: "
 stty_orig=`stty -g` # save original terminal setting.
@@ -27,14 +33,14 @@ set -e
 echo ""
 echo "==> Terraform init"
 echo ""
-terraform init -var "prefix=$prefix" -var "password=$password" terraform/
+terraform init -var "password=$password" terraform/
 
 echo ""
 echo "==> Terraform plan"
 echo ""
-terraform plan -state="$STATE" -var "prefix=$prefix" -var "password=$password" terraform/
+terraform plan -state="$STATE" -var "password=$password" terraform/
 
 echo ""
 echo "==> Terraform apply"
 echo ""
-terraform apply -state="$STATE" -var "prefix=$prefix" -var "password=$password" terraform/
+terraform apply -state="$STATE" -var "password=$password" terraform/

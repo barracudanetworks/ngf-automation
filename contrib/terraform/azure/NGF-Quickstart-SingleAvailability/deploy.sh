@@ -14,33 +14,27 @@ EOF
 
 STATE="state/terraform.tfstate"
 
-# Input prefix 
-echo -n "Enter prefix: "
-stty_orig=`stty -g` # save original terminal setting.
-read prefix         # read the password
-stty $stty_orig     # restore terminal setting.
-
 # Input password 
 echo -n "Enter password: "
 stty_orig=`stty -g` # save original terminal setting.
 stty -echo          # turn-off echoing.
-read password         # read the password
+read password       # read the password
 stty $stty_orig     # restore terminal setting.
 
 # Stop running when command returns error
 set -e
 
 echo ""
-echo "==> Terraform init: $1"
+echo "==> Terraform init"
 echo ""
-terraform init -var "prefix=$prefix" -var "password=$password" $1
+terraform init -var "prefix=$prefix" -var "password=$password" terraform/
 
 echo ""
 echo "==> Terraform plan"
 echo ""
-terraform plan -state="$STATE" -var "prefix=$prefix" -var "password=$password" $1
+terraform plan -state="$STATE" -var "prefix=$prefix" -var "password=$password" terraform/
 
 echo ""
 echo "==> Terraform apply"
 echo ""
-terraform apply -state="$STATE" -var "prefix=$prefix" -var "password=$password" $1
+terraform apply -state="$STATE" -var "prefix=$prefix" -var "password=$password" terraform/

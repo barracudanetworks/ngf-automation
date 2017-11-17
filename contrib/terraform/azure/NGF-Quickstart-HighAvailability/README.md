@@ -1,27 +1,29 @@
-# Barracuda Next Gen Firewall F Series Quick Start Single Availability
+# Barracuda Next Gen Firewall F Series Quick Start High Availability
 
 ## Introduction
 This HashiCorp Terraform template deploy the Barracuda Next Gen Firewall F Series in a new VNET. Deployment is done with in a one-armed fashion where north-south, east-west and VPN tunnel traffic can be intercepted and inspected based on the User Defined Routing that is attached to the subnets that need this control. Do not apply any UDR to the subnet where the NGF is located that points back to the NGF. This will cause routing loops.
 
 To adapt this deployment to your requirements you can modify the variables.tf file and/or the deployment script.
 
-![NGF Azure Network Architecture](images/ngf-sa.png)
+![NGF Azure Network Architecture](images/ngf-ha.png)
 
 ## Prerequisites
 The solution does a check of the template when you use the provide scripts. It does require that [Programmatic Deployment](https://azure.microsoft.com/en-us/blog/working-with-marketplace-images-on-azure-resource-manager/) is enabled for the Barracuda Next Gen Firewall F BYOL or PAYG images. Barracuda recommends use of **D**, **D_v2**, **F** or newer series. 
 
 ## Deployed resources
 Following resources will be created by the template:
-- One Azure VNET with 1 subnet (for the NGF, additional subnets can be configured afterwards or added in the ARM template)
-- One route table that will route all traffic for networks except for the internal networks to the NGF
-- One Virtual machine with a network interface and public IP
+- One Azure VNET with 3 subnets (for the NGF, frontend and backend)
+- One route table for each frontend and backend subnets that will route all traffic to the NGF including the traffic to the other internal subnet
+- Two Virtual machine with a network interface and public IP
+- 1 external load balancer for inbound traffic from internet towards the NGF cluster
 
-**Note** The backend subnets and resources are *not* automatically created by the template. This has to be done manually after template deployment has finished.
+**Note** The frontend and backend subnets and resources are created by the template. Any additional subnets and configuration can be added in the template or added manually.
 
 ## Template Parameters
 | Parameter Name | Description
 |---|---
 password | Password for the Next Gen Admin tool 
+location | The region for the deployment
 prefix | identifying prefix for all VM's being build. e.g WeProd would become WeProd-VM-NGF (Max 19 char, no spaces, [A-Za-z0-9]
 imageSKU | SKU Hourly (PAYG) or BYOL (Bring your own license)
 vmSize | Size of the VMs to be created
@@ -29,7 +31,8 @@ vnet | Network range of the VNET (e.g. 172.16.136.0/22)
 subnet_ngf | Network range of the Subnet containing the NextGen Firewall (e.g. 172.16.136.0/24)
 subnet_frontend | Network range of the frontend subnet (e.g. 172.16.137.0/24)
 subnet_backend | Network range of the backend subnet (e.g. 172.16.138.0/24)
-ngf_ipaddress | Static internal IP address of the NGF (e.g. 172.16.136.10)
+ngf_a_ipaddress | Static internal IP address of the first NGF (e.g. 172.16.136.10)
+ngf_b_ipaddress | Static internal IP address of the second NGF (e.g. 172.16.136.11)
 ngf_subnetmask | Subnetmask of the internal IP address of the NGF (e.g. 24)
 ngf_defaultgateway | Default gateway of the NGF network. This is always the first IP in the Azure subnet where the NGF is located. (e.g. 172.16.136.1)
 

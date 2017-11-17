@@ -4,18 +4,22 @@ variable "password" {
 
 variable "tenant_id" { 
     description = "The Azure RM tenant ID to use"
+    default = ""
 }
 
 variable "subscription_id" { 
     description = "The Azure RM subscription ID to use"
+    default = ""
 }
 
 variable "client_id" { 
     description = "The Azure RM client ID to use"
+    default = ""
 }
 
 variable "client_secret" { 
     description = "The Azure RM client secret to use"
+    default = ""
 }
 
 variable "location" {

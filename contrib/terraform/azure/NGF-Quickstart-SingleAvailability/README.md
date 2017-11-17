@@ -12,16 +12,17 @@ The solution does a check of the template when you use the provide scripts. It d
 
 ## Deployed resources
 Following resources will be created by the template:
-- One Azure VNET with 1 subnet (for the NGF, additional subnets can be configured afterwards or added in the ARM template)
-- One route table that will route all traffic for networks except for the internal networks to the NGF
+- One Azure VNET with 3 subnets (for the NGF, frontend and backend)
+- One route table for each frontend and backend subnets that will route all traffic to the NGF including the traffic to the other internal subnet
 - One Virtual machine with a network interface and public IP
 
-**Note** The backend subnets and resources are *not* automatically created by the template. This has to be done manually after template deployment has finished.
+**Note** The frontend and backend subnets and resources are created by the template. Any additional subnets and configuration can be added in the template or added manually.
 
 ## Template Parameters
 | Parameter Name | Description
 |---|---
 password | Password for the Next Gen Admin tool 
+location | The region for the deployment
 prefix | identifying prefix for all VM's being build. e.g WeProd would become WeProd-VM-NGF (Max 19 char, no spaces, [A-Za-z0-9]
 imageSKU | SKU Hourly (PAYG) or BYOL (Bring your own license)
 vmSize | Size of the VMs to be created

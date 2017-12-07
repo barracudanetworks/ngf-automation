@@ -14,7 +14,7 @@ The solution does a check of the template when you use the provide scripts. It d
 Following resources will be created by the template:
 - One Azure VNET with 3 subnets (for the NGF, frontend and backend)
 - One route table for each frontend and backend subnets that will route all traffic to the NGF including the traffic to the other internal subnet
-- Two Virtual machine with a network interface and public IP
+- Two Virtual machines with a network interface and public IP
 - 1 external load balancer for inbound traffic from internet towards the NGF cluster
 
 **Note** The frontend and backend subnets and resources are created by the template. Any additional subnets and configuration can be added in the template or added manually.
@@ -38,18 +38,17 @@ ngf_defaultgateway | Default gateway of the NGF network. This is always the firs
 
 ## Launching the Template
 
-Terraform requires Azure Credentials to deploy to the correct subscription. Terraform recommends ![using a Service Principal when running in a Shared Environment](https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html) (such as within a CI server/automation) - and ![authenticating via the Azure CLI](https://www.terraform.io/docs/providers/azurerm/authenticating_via_azure_cli.html) when you're running Terraform locally using the Azure Cloud Shell.
+Terraform requires Azure Credentials to deploy to the correct subscription. Terraform recommends [using a Service Principal when running in a Shared Environment](https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html) (such as within a CI server/automation) - and [authenticating via the Azure CLI](https://www.terraform.io/docs/providers/azurerm/authenticating_via_azure_cli.html) when you're running Terraform locally using the Azure Cloud Shell.
 
 Credentials to be installed in the NGF or to access Azure can be stored in a secrets.tfvars file with the following format:
 
+```
 password        = ""
 subscription_id = ""
 client_id       = ""
 client_secret   = ""
 tenant_id       = ""
+```
 
-Alternatively these credentials can be provided using when launching terraform as ![an argument](https://www.terraform.io/intro/getting-started/variables.html) or ![via environment variables](https://www.terraform.io/intro/getting-started/variables.html).
-
-The package provides a deploy.sh and deploy-docker.sh script. The deploy.sh can be used when Terraform is installed localy. The deploy-docker.sh will deploy using Terraform available in a docker image. Terraform is also available in the Azure Cloud Shell. 
-
+Alternatively these credentials can be provided using when launching terraform as [an argument](https://www.terraform.io/intro/getting-started/variables.html) or [via environment variables](https://www.terraform.io/intro/getting-started/variables.html). The package provides a deploy.sh and deploy-docker.sh script. The deploy.sh can be used when Terraform is installed localy. The deploy-docker.sh will deploy using Terraform available in a docker image. Terraform is also available in the Azure Cloud Shell. 
 To delete the whole deployment you can use the destroy.sh or destroy-docker.sh script.

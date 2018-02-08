@@ -14,14 +14,14 @@ Within this project you will find included 5 script files.
 2. NGF_UDR_Workflow.ps1  - Runs in Azure automation as a workflow to performed the UDR rewrites
 3. trigger_udr_webhook.sh - used to trigger the python on the NGF.
 
-#Workflow.
+# Workflow.
 
 - NGF Failover triggers running of trigger_udr_webhook.sh shell script
 - Shell script calls ngf_call_udr_webhook.py 
 - ngf_call_udr_webhook.py  gathers information about the cluster IP's and the local subscription and calls the Azure Automation webhook
 - NGF_UDR_Workflow.ps1 running in Azure Automation takes the information provided and updates UDR's not in the local subscription.
 
-#Installation
+# Installation
 
 
 1. On the NGF via SSH run: 
@@ -39,7 +39,7 @@ Within this project you will find included 5 script files.
 
 
 4. From the NGF get the arm.pfx you would have created to configure Cloud Integration. 
-4a. v2 additional step version of the script find your Application in the Azure AD section of the portal. Under that Application create a new Key and make a note of the value provided (as you cannot see this again)
+	4a. v2 additional step version of the script find your Application in the Azure AD section of the portal. Under that Application create a new Key and make a note of the value provided (as you cannot see this again)
 
 5. In Azure Automation (Create an account if necessary) create a new Powershell Workflow runbook and provide the content of UDR_Webhook.ps1 . Note the Workflow name should be edited to match the name you create in the portal
 6. In Azure Automation go into Modules and Browse the Gallery, then import the latest of the following;
@@ -49,22 +49,25 @@ Within this project you will find included 5 script files.
 		AzureRM.Automation
 7. In Azure Automation, Import the arm.pfx (created on the NGF previously) into the automation Accounts Certificates
 	Convert your PEM's to PFX on the NGF via;
-	openssl pkcs12 -export -out arm.pfx -inkey arm.pem -in arm.pem 
+	`openssl pkcs12 -export -out arm.pfx -inkey arm.pem -in arm.pem `
 Once imported make a note of the certificate thumbprint as you will need it in the next step. 
 
 8. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the NGF's Cloud Integration page. Except
-for the SubscriptionId which you should leave as *
-8a. If using the v2 of this script then in Azure Automation create a new variable called "NGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
+for the SubscriptionId which you should leave as ` *`
+
+	8a. If using the v2 of this script then in Azure Automation create a new variable called "NGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
 If you wish to use a different name then edit line #136 of the v2 powershell to use the new variable name.
 
-8a. Go back into and edit the runbook, change the $connectionName = to be the name of the service principal you created
+	8b. Go back into and edit the runbook, change the $connectionName = to be the name of the service principal you created
 9. Now go into the Runbook you created and create a Webhook, take a note of the URL now!
 10. On the NGF, via SSH, using vi or your preferred editor edit trigger_udr_webhook.sh to provide the URL of the webhook, 
 (further input options can be collected by running python2.7 ngf_call_udr_webhook.py --help)
 			-u <url to webhook>
 11. On the NGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
-	`	/root/azurescript/trigger_udr_webhook.sh -u <url to webhook> `
-11a. If you are running a Control Center managed NGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
+	`	
+	/root/azurescript/trigger_udr_webhook.sh -u <url to webhook>
+	`
+	11a. If you are running a Control Center managed NGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
 -s <servicename> 
 12. For each additional subscription that you want access into assign the NGF Service Principal Read Access to the subscription and
  contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear

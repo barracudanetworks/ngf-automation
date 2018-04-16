@@ -33,6 +33,11 @@ $vmProductType ='barracuda-ng-firewall' # Use 'barracuda-ng-firewall' for F-Seri
 #Run the following to see the other image offers available.
 #Get-AzureRmVMImageOffer -PublisherName "barracudanetworks" -Location "$($location)"
 
+#Set the version to be deployed #latest
+$vmVersion = 'latest'
+#You can review the versions available using the below command
+#Get-AzureRmVMImage -Location $location -PublisherName "barracudanetworks" -Offer $vmProductType -Skus $vmLicenseType
+
 
 # VNET
 $vnetName = 'your_virtual_network_name'
@@ -61,6 +66,7 @@ $datadiskName2 = 'datadisk2'
 $datadiskName3 = 'datadisk3'
 # size of a single data disk size in GB. Multiply the size by the number of disks to received the total disk size of the RAID device
 $datadisksize = 40
+#If using managed disk this must be defined for the storage type e.g StandardLRS, PremiumLRS
 $storageType = ""
 
 
@@ -85,7 +91,7 @@ if(!$useManagedDisks){
 }
 
 # Use an existing Virtual Network
-Write-Verbose ('Using VNET {0} in Resource Group {1}' -f $vnetNamem,$vnetResourceGroupName )
+Write-Verbose ('Using VNET {0} in Resource Group {1}' -f $vnetName,$vnetResourceGroupName )
 $vnet = Get-AzureRmVirtualNetwork -Name $vnetName -ResourceGroupName $vnetResourceGroupName
 
 #If the useManagedDisks variable is set to $true then this will switch the command required.
@@ -154,7 +160,7 @@ if ($customSourceImageUri -eq '')
 {
     Write-Verbose 'Using lastest image from the Azure Marketplace'
     $vm.Plan = @{'name'= $vmLicenseType; 'publisher'= 'barracudanetworks'; 'product' = $vmProductType}
-    $vm = Set-AzureRmVMSourceImage -VM $vm -PublisherName 'barracudanetworks' -Skus $vmLicenseType -Offer $vmProductType -Version 'latest' -ErrorAction Stop
+    $vm = Set-AzureRmVMSourceImage -VM $vm -PublisherName 'barracudanetworks' -Skus $vmLicenseType -Offer $vmProductType -Version $vmVersion -ErrorAction Stop
 
     #
     if($useManagedDisks){

@@ -14,14 +14,14 @@ Within this project you will find included 5 script files.
 2. NGF_UDR_Workflow.ps1  - Runs in Azure automation as a workflow to performed the UDR rewrites
 3. trigger_udr_webhook.sh - used to trigger the python on the NGF.
 
-#Workflow.
+# Workflow.
 
 - NGF Failover triggers running of trigger_udr_webhook.sh shell script
 - Shell script calls ngf_call_udr_webhook.py 
 - ngf_call_udr_webhook.py  gathers information about the cluster IP's and the local subscription and calls the Azure Automation webhook
 - NGF_UDR_Workflow.ps1 running in Azure Automation takes the information provided and updates UDR's not in the local subscription.
 
-#Installation
+# Installation
 
 
 1. On the NGF via SSH run: 
@@ -78,7 +78,8 @@ Notes.
 
 By default this script doesn't try to interact with the subscription that the NGF is located in, to allow it to do this uncomment line 166 & 238 of NGF_UDR_Workflow.ps1
 
-#Troubleshooting.
+# Troubleshooting.
 Issues can occur in a few locations the below guide should help you identify which area is preventing the script from completing succesfully. 
 
-1. 
+1. Permissions - if the script cannot see any route tables check that the permissions are correctly assigned to the subscription, route tables and the script is using the correct ones in the automation account
+2. Test Mode - to prevent inadvertent damage the script defaults to test mode, but make sure you turn this off before you go live.

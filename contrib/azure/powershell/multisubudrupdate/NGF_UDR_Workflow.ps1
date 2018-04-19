@@ -12,6 +12,7 @@ workflow Update_UDR
                 LASTEDIT: 08 February 2018
                 v2 . Updated to use the REST API to make changes to the route tables rather than an inline script.
 				v2.1 Minor updates to improve debugging when API calls fail
+				v2.2 Updated to latest API for new disableBGPPropagation setting
         #>
     param(
     [object]$WebhookData
@@ -183,7 +184,7 @@ workflow Update_UDR
                                         
                                         Write-Output ("Updating Resource: " + $Resource.ResourceName + " in ResourceGroup: " +  $Resource.ResourceGroupName)
                                         #Sets the routetableuri to call
-                                        $routetableuri = "https://management.azure.com/subscriptions/$($sub.SubscriptionId)/resourceGroups/$($Resource.ResourceGroupName)/providers/Microsoft.Network/routeTables/$($Resource.ResourceName)?api-version=2017-09-01"
+                                        $routetableuri = "https://management.azure.com/subscriptions/$($sub.SubscriptionId)/resourceGroups/$($Resource.ResourceGroupName)/providers/Microsoft.Network/routeTables/$($Resource.ResourceName)?api-version=2018-01-01"
 
                                         if($testmode){
                                             

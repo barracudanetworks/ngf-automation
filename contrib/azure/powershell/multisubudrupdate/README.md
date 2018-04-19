@@ -73,3 +73,12 @@ If you wish to use a different name then edit line #136 of the v2 powershell to 
 These lines can be commented out to allow the script to make changes. If this section is enabled then the values it takes are manually provided within the script a little further down at line 
 43-48 you can provide the details that the NGF would provide. IP's and Subscription ID.  
 		
+
+Notes. 
+
+By default this script doesn't try to interact with the subscription that the NGF is located in, to allow it to do this uncomment line 166 & 238 of NGF_UDR_Workflow.ps1
+
+#Troubleshooting.
+Issues can occur in a few locations the below guide should help you identify which area is preventing the script from completing succesfully. 
+
+1. 

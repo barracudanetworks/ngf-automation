@@ -71,6 +71,7 @@ workflow Update_UDR
             Write-Output "============="
             Write-Output $ConvertedJson
             Write-Output "JSON Sub" $ConvertedJson.SubscriptionId
+			if($ConvertedJson.SubscriptionId -eq "secondnic"){Write-Output "Script triggered on behalf of second NIC will act upon all Subs"}
 
         }catch{
             if (!$ConvertedJson)

@@ -3,8 +3,9 @@
     "",
     "\\contrib",
     "\\contrib\\azure",
-    "\\contrib\\azure\\powershell"
+    "\\contrib\\azure\\powershell",
+    "\\contrib\\azure\\powershell\\multisubudrupdate"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\module",
+  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\NGF_UDR_Workflow.ps1",
   "PreviewInSolutionExplorer": false
 }

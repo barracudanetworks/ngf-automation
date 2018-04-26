@@ -42,7 +42,7 @@ Within this project you will find included 5 script files.
 4a. v2 additional step version of the script find your Application in the Azure AD section of the portal. Under that Application create a new Key and make a note of the value provided (as you cannot see this again)
 
 5. In Azure Automation (Create an account if necessary) create a new Powershell Workflow runbook and provide the content of UDR_Webhook.ps1 . Note the Workflow name should be edited to match the name you create in the portal
-6. In Azure Automation go into Modules and Browse the Gallery, then import the latest of the following;
+6. In Azure Automation go into Modules and Browse the Gallery, then import the latest of the following at least;
 		AzureRM.profile
 		AzureRM.resources
 		AzureRM.Network
@@ -77,6 +77,11 @@ These lines can be commented out to allow the script to make changes. If this se
 Notes. 
 
 By default this script doesn't try to interact with the subscription that the NGF is located in, to allow it to do this uncomment line 166 & 238 of NGF_UDR_Workflow.ps1
+
+#Multi NIC
+Multi NIC deployments are not recommended for their complexity, however if you insist then per the example in trigger_udr_webhook.sh call the python with an additional -i parameter
+The value of this parameter should be the name you give to the additional IP on the box (please make sure they are the same name for both Network and HA Network)
+The script will look these up and trigger the automation twice, once for each NIC pair. 
 
 # Troubleshooting.
 Issues can occur in a few locations the below guide should help you identify which area is preventing the script from completing succesfully. 

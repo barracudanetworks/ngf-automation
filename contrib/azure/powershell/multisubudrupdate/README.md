@@ -63,7 +63,7 @@ If you wish to use a different name then edit line #136 of the v2 powershell to 
 (further input options can be collected by running python2.7 ngf_call_udr_webhook.py --help)
 			-u <url to webhook>
 11. On the NGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
-	`	/root/azurescript/trigger_udr_webhook.sh -u <url to webhook> `
+	`	/root/azurescript/trigger_udr_webhook.sh <url to webhook> `
 11a. If you are running a Control Center managed NGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
 -s <servicename> 
 12. For each additional subscription that you want access into assign the NGF Service Principal Read Access to the subscription and

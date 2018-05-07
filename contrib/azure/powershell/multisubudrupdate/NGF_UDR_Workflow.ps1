@@ -17,7 +17,8 @@ workflow Update_UDR
     param(
     [object]$WebhookData
     )
-    #Uncomment the below lines to run the script in test mode, fill in the details for the webhookbody with test data if you are not using the webhook
+    #This script is in test mode by default, remove the leading # to comment out lines 22,23 & 24. 
+	#fill in the details for the webhookbody with your test data if you are not using the webhook
     #<#
     $testmode = $true
     $webhookData = "data"

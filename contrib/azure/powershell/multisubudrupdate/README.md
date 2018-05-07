@@ -81,7 +81,8 @@ Notes.
 
 By default this script doesn't try to interact with the subscription that the NGF is located in, to allow it to do this uncomment line 166 & 238 of NGF_UDR_Workflow.ps1
 
-#Multi NIC
+# Multi NIC.
+
 Multi NIC deployments are not recommended for their complexity, however if you insist then per the example in trigger_udr_webhook.sh call the python with an additional -n parameter
 `	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -n=<nicname>`
 So if you have a multi-NIC device in Control Center then an example command would be;

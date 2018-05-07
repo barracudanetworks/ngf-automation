@@ -1,15 +1,54 @@
-if test -n "$1"
+#!/bin/bash
+for i in "$@"
+do
+case $i in
+    -u=*|--url=*)
+    URL="${i#*=}"
+    ;;
+    -s=*|--service=*)
+    SERVICE="${i#*=}"
+    ;;
+    -n=*|--nic=*)
+    NIC="${i#*=}"
+    ;;
+	--default)
+    DEFAULT=YES
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+done
+
+if test -n "${URL}"
     then
-        python2.7 /root/azurescript/ngf_call_udr_webhook.py -u $1 
-	if test -n "$2"
-		then	
-			python2.7 /root/azurescript/ngf_call_udr_webhook.py -u $1 -i $2
-	fi
+        
+	if test -n "${SERVICE}"
+		then
+			if test -n "${NIC}" 
+				then
+					#echo URL= ${URL}
+					#echo SERVICE = ${SERVICE}
+					#echo NIC = ${NIC}
+					#Dual NIC so calls webhook twice for each NIC
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} 
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} -n ${NIC}
+				else
+					#echo URL= ${URL}
+					#echo SERVICE = ${SERVICE}
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} 
+			fi
+		else
+			if test -n "${NIC}"
+				then	
+				#Dual NIC so calling webhook twice for each NIC.
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL}
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -n ${NIC}
+				#echo URL= ${URL}
+				#echo NIC = ${NIC}
+			else
+				python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL}
+				#echo URL= ${URL}
+			fi
+	fi	
 fi
-
-
-#The below example is for when running MultiNIC and needed to change UDR for additional IP's'
-#python2.7 /root/azurescript/ngf_call_udr_webhook.py -u <url to webhook> -i <NAMEOFADDITIONALIP>
-
-#The below example is for when running under control center with non-default service names
-#python2.7 /root/azurescript/ngf_call_udr_webhook.py -u <url to webhook> -s <NAMEOFS1_FWSERVICE>

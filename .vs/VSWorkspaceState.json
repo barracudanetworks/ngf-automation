@@ -6,6 +6,6 @@
     "\\contrib\\azure\\powershell",
     "\\contrib\\azure\\powershell\\multisubudrupdate"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\README.md",
+  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\trigger_udr_webhook.sh",
   "PreviewInSolutionExplorer": false
 }

@@ -54,8 +54,10 @@ Once imported make a note of the certificate thumbprint as you will need it in t
 
 9. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the NGF's Cloud Integration page. Except
 for the SubscriptionId which you should leave as *
+
 9a. If using the v2 of this script then in Azure Automation create a new variable called "NGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
 If you wish to use a different name then edit line #136 of the v2 powershell to use the new variable name.
+
 9b. Go back into and edit the runbook, change the $connectionName = to be the name of the service principal you created
 
 10. Now go into the Runbook you created and create a Webhook, take a note of the URL now!

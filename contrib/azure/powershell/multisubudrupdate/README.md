@@ -39,40 +39,62 @@ Within this project you will find included 5 script files.
 
 
 4. From the NGF get the arm.pfx you would have created to configure Cloud Integration. 
-	4a. v2 additional step version of the script find your Application in the Azure AD section of the portal. Under that Application create a new Key and make a note of the value provided (as you cannot see this again)
+5. Find your Application in the Azure AD section of the portal. Under that Application create a new Key and make a note of the value provided (as you cannot see this again)
 
-5. In Azure Automation (Create an account if necessary) create a new Powershell Workflow runbook and provide the content of UDR_Webhook.ps1 . Note the Workflow name should be edited to match the name you create in the portal
-6. In Azure Automation go into Modules and Browse the Gallery, then import the latest of the following;
+6. In Azure Automation (Create an account if necessary) create a new Powershell Workflow runbook and provide the content of UDR_Webhook.ps1 . Note the Workflow name should be edited to match the name you create in the portal
+7. In Azure Automation go into Modules and Browse the Gallery, then import the latest of the following at least;
 		AzureRM.profile
 		AzureRM.resources
 		AzureRM.Network
 		AzureRM.Automation
-7. In Azure Automation, Import the arm.pfx (created on the NGF previously) into the automation Accounts Certificates
+8. In Azure Automation, Import the arm.pfx (created on the NGF previously) into the automation Accounts Certificates
 	Convert your PEM's to PFX on the NGF via;
-	`openssl pkcs12 -export -out arm.pfx -inkey arm.pem -in arm.pem `
+	openssl pkcs12 -export -out arm.pfx -inkey arm.pem -in arm.pem 
 Once imported make a note of the certificate thumbprint as you will need it in the next step. 
 
-8. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the NGF's Cloud Integration page. Except
-for the SubscriptionId which you should leave as ` *`
+9. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the NGF's Cloud Integration page. Except
+for the SubscriptionId which you should leave as *
 
-	8a. If using the v2 of this script then in Azure Automation create a new variable called "NGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
+9a. If using the v2 of this script then in Azure Automation create a new variable called "NGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
 If you wish to use a different name then edit line #136 of the v2 powershell to use the new variable name.
 
-	8b. Go back into and edit the runbook, change the $connectionName = to be the name of the service principal you created
-9. Now go into the Runbook you created and create a Webhook, take a note of the URL now!
-10. On the NGF, via SSH, using vi or your preferred editor edit trigger_udr_webhook.sh to provide the URL of the webhook, 
-(further input options can be collected by running python2.7 ngf_call_udr_webhook.py --help)
-			-u <url to webhook>
-11. On the NGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
-	`	
-	/root/azurescript/trigger_udr_webhook.sh -u <url to webhook>
-	`
-	11a. If you are running a Control Center managed NGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
--s <servicename> 
-12. For each additional subscription that you want access into assign the NGF Service Principal Read Access to the subscription and
- contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear
+9b. Go back into and edit the runbook, change the $connectionName = to be the name of the service principal you created
 
-13. For testing within the Azure Automation powershell you have two sections lines #19 - 23 enables the script in test mode in which it won't make any changes and will print all debug.
+10. Now go into the Runbook you created and create a Webhook, take a note of the URL now!
+
+11. On the NGF, via SSH, using vi or your preferred editor edit trigger_udr_webhook.sh to provide the URL of the webhook, 
+(further input options can be collected by running python2.7 ngf_call_udr_webhook.py --help)
+			`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> `
+	
+12. On the NGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
+	`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> `
+	
+12a. If you are running a Control Center managed NGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
+`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -s=<SERVICENAME>`
+
+13. For each additional subscription that you want access into assign the NGF Service Principal Read Access to the subscription and
+ contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear
+ 
+14. For testing within the Azure Automation powershell you have two sections lines #19 - 23 enables the script in test mode in which it won't make any changes and will print all debug.
 These lines can be commented out to allow the script to make changes. If this section is enabled then the values it takes are manually provided within the script a little further down at line 
 43-48 you can provide the details that the NGF would provide. IP's and Subscription ID.  
 		
+
+Notes. 
+
+By default this script doesn't try to interact with the subscription that the NGF is located in, to allow it to do this uncomment line 166 & 238 of NGF_UDR_Workflow.ps1
+
+# Multi NIC.
+
+Multi NIC deployments are not recommended for their complexity, however if you insist then per the example in trigger_udr_webhook.sh call the python with an additional -n parameter
+`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -n=<nicname>`
+So if you have a multi-NIC device in Control Center then an example command would be;
+`	/root/azurescript/trigger_udr_webhook.sh -u=http://url -s=SERVICE1 -n=eth1 `
+The value of this parameter should be the name you give to the additional IP on the box (please make sure they are the same name for both Network and HA Network)
+The script will look these up and trigger the automation twice, once for each NIC pair. 
+
+# Troubleshooting.
+Issues can occur in a few locations the below guide should help you identify which area is preventing the script from completing succesfully. 
+
+1. Permissions - if the script cannot see any route tables check that the permissions are correctly assigned to the subscription, route tables and the script is using the correct ones in the automation account
+2. Test Mode - to prevent inadvertent damage the script defaults to test mode, but make sure you turn this off before you go live.

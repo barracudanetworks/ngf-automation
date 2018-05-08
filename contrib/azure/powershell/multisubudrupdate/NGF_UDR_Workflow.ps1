@@ -12,11 +12,13 @@ workflow Update_UDR
                 LASTEDIT: 08 February 2018
                 v2 . Updated to use the REST API to make changes to the route tables rather than an inline script.
 				v2.1 Minor updates to improve debugging when API calls fail
+				v2.2 Updated to latest API for new disableBGPPropagation setting
         #>
     param(
     [object]$WebhookData
     )
-    #Uncomment the below lines to run the script in test mode, fill in the details for the webhookbody with test data if you are not using the webhook
+    #This script is in test mode by default, remove the leading # to comment out lines 22,23 & 24. 
+	#fill in the details for the webhookbody with your test data if you are not using the webhook
     #<#
     $testmode = $true
     $webhookData = "data"
@@ -70,6 +72,7 @@ workflow Update_UDR
             Write-Output "============="
             Write-Output $ConvertedJson
             Write-Output "JSON Sub" $ConvertedJson.SubscriptionId
+			if($ConvertedJson.SubscriptionId -eq "secondnic"){Write-Output "Script triggered on behalf of second NIC will act upon all Subs"}
 
         }catch{
             if (!$ConvertedJson)
@@ -183,7 +186,7 @@ workflow Update_UDR
                                         
                                         Write-Output ("Updating Resource: " + $Resource.ResourceName + " in ResourceGroup: " +  $Resource.ResourceGroupName)
                                         #Sets the routetableuri to call
-                                        $routetableuri = "https://management.azure.com/subscriptions/$($sub.SubscriptionId)/resourceGroups/$($Resource.ResourceGroupName)/providers/Microsoft.Network/routeTables/$($Resource.ResourceName)?api-version=2017-09-01"
+                                        $routetableuri = "https://management.azure.com/subscriptions/$($sub.SubscriptionId)/resourceGroups/$($Resource.ResourceGroupName)/providers/Microsoft.Network/routeTables/$($Resource.ResourceName)?api-version=2018-01-01"
 
                                         if($testmode){
                                             

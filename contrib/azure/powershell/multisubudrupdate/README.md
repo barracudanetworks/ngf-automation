@@ -54,19 +54,27 @@ Once imported make a note of the certificate thumbprint as you will need it in t
 
 9. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the NGF's Cloud Integration page. Except
 for the SubscriptionId which you should leave as *
+
 9a. If using the v2 of this script then in Azure Automation create a new variable called "NGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
 If you wish to use a different name then edit line #136 of the v2 powershell to use the new variable name.
+
 9b. Go back into and edit the runbook, change the $connectionName = to be the name of the service principal you created
+
 10. Now go into the Runbook you created and create a Webhook, take a note of the URL now!
+
 11. On the NGF, via SSH, using vi or your preferred editor edit trigger_udr_webhook.sh to provide the URL of the webhook, 
 (further input options can be collected by running python2.7 ngf_call_udr_webhook.py --help)
-			-u <url to webhook>
+			`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> `
+	
 12. On the NGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
 	`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> `
+	
 12a. If you are running a Control Center managed NGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
 `	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -s=<SERVICENAME>`
+
 13. For each additional subscription that you want access into assign the NGF Service Principal Read Access to the subscription and
  contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear
+ 
 14. For testing within the Azure Automation powershell you have two sections lines #19 - 23 enables the script in test mode in which it won't make any changes and will print all debug.
 These lines can be commented out to allow the script to make changes. If this section is enabled then the values it takes are manually provided within the script a little further down at line 
 43-48 you can provide the details that the NGF would provide. IP's and Subscription ID.  

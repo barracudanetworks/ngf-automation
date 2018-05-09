@@ -27,7 +27,7 @@ def read_boxnet(filename,confsec):
 	except IOError:
 		logging.warning("Unable to open config file" + filename)
 		exit()
-     
+
 	boxnet.seek(0, os.SEEK_SET)
 	#print boxnet.getvalue()
 	return boxnet
@@ -52,7 +52,7 @@ def call_webhook(url, subid, boxip, haip):
 		import ssl
 
 	#print url
-   
+
 	payload = '[{"SubscriptionId":"'+ str(subid) + '","id":"NGF","properties":{"OldNextHopIP":"'+ str(haip) + '","NewNextHopIP":"'+ str(boxip) + '"}}]'
 	logger.debug(payload)
 	#print payload
@@ -100,9 +100,9 @@ def main():
 		logger.setLevel(options.verbosity)
 	else:
 		parser.error("invalid verbosity selected. please check --help")
-        
+
 	logging.basicConfig(filename=options.logfilepath,format="%(asctime)s %(levelname)-7s - %(message)s")
-          
+
 	servicename = options.servicename
 	#decides if the box is the active unit
 	if(commands.getoutput('ps -C '+ servicename).find(servicename) != -1):
@@ -116,7 +116,7 @@ def main():
 		if len(boxip) < 5:
 			logger.warning("Wasn't able to collect boxip from " + confpath)
 			exit()
-        
+
 	#New section to address dual NIC boxes where second IP is needed
 		if len(options.secondip) > 1:
 			secondboxip = get_boxip(confpath,'boxnet.conf','addnet_'+options.secondip)
@@ -126,9 +126,9 @@ def main():
 			exit()
 
     #The boxip is the IP taken from the ha network config file. Clusters reverse this pair of files so this should be the other box.  
-    
+
 		haip = get_boxip(confpath,'boxnetha.conf')
-    
+
 		if len(haip) < 5:
 			logger.warning("Wasn't able to collect HA boxip from " + confpath)
 			exit()
@@ -167,7 +167,7 @@ def main():
 			exit()
 		else:
 			logger.info("Collected the Azure subscription ID")
-        
+
 		#cleans up the temp conf file.
 		os.remove('/tmp/cloud.conf')
 
@@ -179,7 +179,7 @@ def main():
 		else:
 			logger.warning("failed to call the webhook error status:" + webhook )
 
-		if len(secondboxip) > 1:
+		if len(options.secondip) > 1:
 			logger.info("Second IP address provided and found")
 			webhook = call_webhook(options.webhookurl, "secondnic", secondboxip, secondhaip)
 			logger.info("Calling the Webhook on :" + str(options.webhookurl))
@@ -190,7 +190,6 @@ def main():
 				logger.warning("failed to call the webhook error status:" + webhook )
 	else:
 		logger.warning("This NGF has is not running as the active unit. Not executing script")
-            
 
 if __name__=="__main__":
 	exit(main())

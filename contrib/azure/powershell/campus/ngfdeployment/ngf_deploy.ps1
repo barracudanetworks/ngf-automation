@@ -204,7 +204,7 @@ if ($nic1InternalIP -eq '')
 		#When deploying a WAF adds the interface into the Load Balancers Backend pool and NAT Rules
 		$nic = New-AzureRmNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId -LoadBalancerBackendAddressPoolId $BackendPool.Id -LoadBalancerInboundNatRuleId $natRule1.Id, $natRule2.Id -NetworkSecurityGroupId $nsg.id
 	}else{
-		$nic = New-AzureRmNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -PublicIpAddressId $pip.Id -SubnetId $SubnetId -EnableIPForwarding -NetworkSecurityGroupId $nsg.id -EnableAcceleratedNetworking 
+		$nic = New-AzureRmNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -PublicIpAddressId $pip.Id -SubnetId $SubnetId -EnableIPForwarding -NetworkSecurityGroupId $nsg.id  
 	}
     
 }
@@ -215,7 +215,7 @@ else
 		#When deploying a WAF adds the interface into the Load Balancers Backend pool and NAT Rules
 		$nic = New-AzureRmNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -PrivateIpAddress $nic1InternalIP -SubnetId $SubnetId -LoadBalancerBackendAddressPoolId $BackendPool.Id -LoadBalancerInboundNatRuleId $natRule1.Id, $natRule2.Id -NetworkSecurityGroupId $nsg.id
 	}else{
-		$nic = New-AzureRmNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -PrivateIpAddress $nic1InternalIP -PublicIpAddressId $pip.Id -SubnetId $SubnetId -EnableIPForwarding -NetworkSecurityGroupId $nsg.id -EnableAcceleratedNetworking 
+		$nic = New-AzureRmNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -PrivateIpAddress $nic1InternalIP -PublicIpAddressId $pip.Id -SubnetId $SubnetId -EnableIPForwarding -NetworkSecurityGroupId $nsg.id 
 	}
     
 }

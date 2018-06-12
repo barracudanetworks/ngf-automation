@@ -4,8 +4,9 @@
     "\\contrib",
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
-    "\\contrib\\azure\\powershell\\multisubudrupdate"
+    "\\contrib\\azure\\powershell\\campus",
+    "\\contrib\\azure\\powershell\\campus\\ngfdeployment"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\ngf_call_udr_webhook.py",
+  "SelectedNode": "\\contrib\\azure\\powershell\\campus\\ngfdeployment",
   "PreviewInSolutionExplorer": false
 }

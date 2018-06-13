@@ -4,8 +4,9 @@
     "\\contrib",
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
-    "\\contrib\\azure\\powershell\\multisubudrupdate"
+    "\\contrib\\azure\\powershell\\campus",
+    "\\contrib\\azure\\powershell\\campus\\ngfdeployment"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\trigger_udr_webhook.sh",
+  "SelectedNode": "\\contrib\\azure\\powershell\\campus\\ngfdeployment",
   "PreviewInSolutionExplorer": false
 }

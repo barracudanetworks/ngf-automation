@@ -5,8 +5,9 @@
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
     "\\contrib\\azure\\powershell\\campus",
-    "\\contrib\\azure\\powershell\\campus\\ngfdeployment"
+    "\\contrib\\azure\\powershell\\campus\\ngfdeployment",
+    "\\contrib\\azure\\powershell\\multisubudrupdate"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\campus\\ngfdeployment",
+  "SelectedNode": "\\contrib\\azure\\powershell\\campus\\ngfdeployment\\ngf_deploy.ps1",
   "PreviewInSolutionExplorer": false
 }

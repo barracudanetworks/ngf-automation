@@ -4,6 +4,7 @@ import re
 import ConfigParser
 import json
 import commands
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ def get_boxip(confpath, conffile,section='boxnet'):
 def call_webhook(url, subid, boxip, haip):
     
 	try:
-		import requestsfg
+		import requests
 	except ImportError:
 		requests = None
 		import urllib2
@@ -69,9 +70,9 @@ def call_webhook(url, subid, boxip, haip):
 		return results
 
 	except urllib2.URLError as e:
-		logging.warning("URL Call failed because: " + e.reason.message)
-    # Response, status etc
-		exit()
+		logging.warning("URL Call failed because: " + e.message)
+		
+	return 'FAILED'
 
 def main():
        
@@ -88,9 +89,9 @@ def main():
 	parser.add_option("-u", "--webhookurl", default='', help="URL of automation webhook")
 	parser.add_option("-c", "--configpath", default='/opt/phion/config/active/', help="source path of log files to upload")
 	parser.add_option("-l", "--logfilepath", default='/phion0/logs/update_UDR.log', help="logfile path and name")
-	parser.add_option("-s", "--servicename", default='S1_NGFW', help="name of the NGFW service")
+	parser.add_option("-s", "--servicename", default='S1_NGFW', help="name of the NGFW service with server prepended")
 	parser.add_option("-i", "--secondip", default='', help="name of second ip address")
-	
+
 
 	# parse argsbox
 	(options, args) = parser.parse_args()
@@ -102,94 +103,121 @@ def main():
 		parser.error("invalid verbosity selected. please check --help")
 
 	logging.basicConfig(filename=options.logfilepath,format="%(asctime)s %(levelname)-7s - %(message)s")
-
 	servicename = options.servicename
-	#decides if the box is the active unit
-	if(commands.getoutput('ps -C '+ servicename).find(servicename) != -1):
-		logger.info("This NGF has been detected as active" + str(commands.getoutput('ps -C '+ servicename)))
-		confpath = options.configpath
-    #Get's the configuration files for HA  
-    #The boxip is the IP taken from the local network config file. On failover this should be the IP of the active box.     
 
-		boxip = get_boxip(confpath,'boxnet.conf')
+	loopnum = 1
+	#Creates a loop so that if this fails it will repeat the attempt, will stop after 10 attempts
+	condition = True
+	while condition:
 
-		if len(boxip) < 5:
-			logger.warning("Wasn't able to collect boxip from " + confpath)
-			exit()
+		
+		#increases the wait period between loops so 2nd loop runs 30 seconds after the first, 2nd loop is 60 seconds, 3rd is 90 seconds, so last loop is 4 and a half minutes delay over the previous.
+		sleeptime = 30 * loopnum
+		logger.info("UDR Webhook script triggered, iteration number:" + str(loopnum))
+		
+		#decides if the box is the active unit
+		if(commands.getoutput('ps -fC '+ servicename).find(servicename) != -1):
+			logger.info("This NGF has been detected as active" + str(commands.getoutput('ps -fC '+ servicename)))
+			confpath = options.configpath
+		#Get's the configuration files for HA  
+		#The boxip is the IP taken from the local network config file. On failover this should be the IP of the active box.     
 
-	#New section to address dual NIC boxes where second IP is needed
-		if len(options.secondip) > 1:
-			secondboxip = get_boxip(confpath,'boxnet.conf','addnet_'+options.secondip)
-
-		if len(boxip) < 5:
-			logger.warning("Wasn't able to collect second boxip from " + confpath )
-			exit()
-
-    #The boxip is the IP taken from the ha network config file. Clusters reverse this pair of files so this should be the other box.  
-
-		haip = get_boxip(confpath,'boxnetha.conf')
-
-		if len(haip) < 5:
-			logger.warning("Wasn't able to collect HA boxip from " + confpath)
-			exit()
-
-		#New section to address dual NIC boxes where second IP is needed
-		if len(options.secondip) > 1:
-			secondhaip = get_boxip(confpath,'boxnetha.conf','addnet_'+options.secondip)
+			boxip = get_boxip(confpath,'boxnet.conf')
 
 			if len(boxip) < 5:
-				logger.warning("Wasn't able to collect HA second boxip from " + confpath)
+				logger.warning("Wasn't able to collect boxip from " + confpath)
 				exit()
 
-		cloudconf = ConfigParser.ConfigParser()
+		#New section to address dual NIC boxes where second IP is needed
+			if len(options.secondip) > 1:
+				secondboxip = get_boxip(confpath,'boxnet.conf','addnet_'+options.secondip)
 
-		#opens the config file for cloud integration and creates a dummy section
-		with open(confpath + 'cloudintegration.conf', 'r') as f:
-			config_string = '[dummy_section]\n' + f.read()
+			if len(boxip) < 5:
+				logger.warning("Wasn't able to collect second boxip from " + confpath )
+				exit()
 
-		#creates a temp file for conf parser to read that contains the dummy section header.
-		with open('/tmp/cloud.conf', 'a') as the_file:
-			the_file.write(config_string)
+		#The boxip is the IP taken from the ha network config file. Clusters reverse this pair of files so this should be the other box.  
 
-        #ConfigParser reads in from the temp file with the dummy section at the top
-		try:
-			cloudconf.read('/tmp/cloud.conf')
-		except ConfigParser.ParsingError: 
-			pass
+			haip = get_boxip(confpath,'boxnetha.conf')
 
-        #Check that we have the sections before we find the subscription
-		if cloudconf.sections() > 0:
-			subid = cloudconf.get('azure','SUBSCRIPTIONID')
+			if len(haip) < 5:
+				logger.warning("Wasn't able to collect HA boxip from " + confpath)
+				exit()
 
-		#Check that the subscription makes sense.
-		if len(str(subid)) < 20:    
-			logger.warning("Wasn't able to collect a valid subscription id from " + confpath)   
-			exit()
-		else:
-			logger.info("Collected the Azure subscription ID")
+			#New section to address dual NIC boxes where second IP is needed
+			if len(options.secondip) > 1:
+				secondhaip = get_boxip(confpath,'boxnetha.conf','addnet_'+options.secondip)
 
-		#cleans up the temp conf file.
-		os.remove('/tmp/cloud.conf')
+				if len(boxip) < 5:
+					logger.warning("Wasn't able to collect HA second boxip from " + confpath)
+					exit()
 
-		webhook = call_webhook(options.webhookurl, str(subid)[2:-2], boxip, haip)
-		logger.info("Calling the Webhook on :" + str(options.webhookurl))
+			cloudconf = ConfigParser.ConfigParser()
 
-		if (json.loads(webhook)['JobIds']):
-			logger.info("Success JobID:" + (str(json.loads(webhook)['JobIds'])[2:-2]))
-		else:
-			logger.warning("failed to call the webhook error status:" + webhook )
+			#opens the config file for cloud integration and creates a dummy section
+			with open(confpath + 'cloudintegration.conf', 'r') as f:
+				config_string = '[dummy_section]\n' + f.read()
 
-		if len(options.secondip) > 1:
-			logger.info("Second IP address provided and found")
-			webhook = call_webhook(options.webhookurl, "secondnic", secondboxip, secondhaip)
-			logger.info("Calling the Webhook on :" + str(options.webhookurl))
+			#creates a temp file for conf parser to read that contains the dummy section header.
+			with open('/tmp/cloud.conf', 'a') as the_file:
+				the_file.write(config_string)
 
-			if (json.loads(webhook)['JobIds']):
-				logger.info("Success JobID:" + (str(json.loads(webhook)['JobIds'])[2:-2]))
+			#ConfigParser reads in from the temp file with the dummy section at the top
+			try:
+				cloudconf.read('/tmp/cloud.conf')
+			except ConfigParser.ParsingError: 
+				pass
+
+			#Check that we have the sections before we find the subscription
+			if cloudconf.sections() > 0:
+				subid = cloudconf.get('azure','SUBSCRIPTIONID')
+
+			#Check that the subscription makes sense.
+			if len(str(subid)) < 20:    
+				logger.warning("Wasn't able to collect a valid subscription id from " + confpath)   
+				exit()
 			else:
-				logger.warning("failed to call the webhook error status:" + webhook )
-	else:
-		logger.warning("This NGF has is not running as the active unit. Not executing script")
+				logger.info("Collected the Azure subscription ID")
+
+			#cleans up the temp conf file.
+			os.remove('/tmp/cloud.conf')
+
+			logger.info("Calling the Webhook on :" + str(options.webhookurl))
+			webhook = call_webhook(options.webhookurl, str(subid)[2:-2], boxip, haip)
+		
+			logger.info(webhook)
+
+			if (webhook != 'FAILED'):
+				condition = False
+
+				if (json.loads(webhook)['JobIds']):
+					logger.info("Success JobID:" + (str(json.loads(webhook)['JobIds'])[2:-2]))
+				else:
+					logger.warning("failure to get status from webhook:" + webhook )
+
+				if len(options.secondip) > 1:
+					logger.info("Second IP address provided and found")
+					webhook = call_webhook(options.webhookurl, "secondnic", secondboxip, secondhaip)
+					logger.info("Calling the Webhook on :" + str(options.webhookurl))
+
+					if (json.loads(webhook)['JobIds']):
+						logger.info("Success JobID:" + (str(json.loads(webhook)['JobIds'])[2:-2]))
+					else:
+						logger.warning("failure to get status from webhook:" + webhook )
+			
+			#pauses between loops 
+			logger.info("Sleeping for " + str(sleeptime))
+			time.sleep(sleeptime)
+			#If this is the 10th loop or if the webhook is successful then stops the loop condition being true
+			if (loopnum == 10):
+				condition = False
+
+			loopnum+=1
+
+		else:
+			logger.warning("This NGF has is not running as the active unit. Not executing script")
+			condition=False
+	#end of loop
 
 if __name__=="__main__":
 	exit(main())

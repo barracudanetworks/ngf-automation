@@ -5,3 +5,12 @@
 /.vs/ngf-automation/v15
 /.vs/slnx.sqlite
 /contrib/azure/python/multiip_fwrule_rewrite (2).py
+/contrib/azure/powershell/module/Import_O365IPs.ps1
+/contrib/azure/powershell/module/Import_AzureIPs.ps1
+/contrib/azure/powershell/module/Examples.ps1
+/contrib/azure/powershell/module/Barracuda_NGF_Module.zip
+/contrib/azure/powershell/module/Barracuda_NGF_Module.tests.ps1
+/contrib/azure/powershell/module/Barracuda_NGF_Module.pssproj
+/contrib/azure/powershell/module/Barracuda_NGF_Module.psm1
+/contrib/azure/powershell/module/Barracuda_NGF_Module.psd1
+/contrib/azure/powershell/module

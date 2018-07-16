@@ -1,18 +1,18 @@
-This project is intended to provide an example of how you can utilise scripts on the Barracuda NextGen Firewall F-Series to update dynamic objects. 
+This project is intended to provide an example of how you can utilise scripts on the Barracuda CloudGen Firewall F-Series to update dynamic objects and multiple ipconfigs in Azure.
 
 In this project a python script on the 
 
 Within this project you will find included 5 script files. 
 
-1. multiip_object_rewrite.py - gathers the local CGF information and submits to Azure Webhook. *Use the pre7.1 varient for firewalls on 7.0 or earlier firmware.*
-2. CGF_UDR_Workflow.ps1  - Runs in Azure automation as a workflow to performed the UDR rewrites
-3. trigger_multiip_rewrite.sh - used to trigger the python on the CGF.
+1. multiip_object_rewrite.py - gathers the local CGF information and updates the dynamic object files
+2. trigger_multiip_rewrite.sh - used to trigger the python on the CGF.
+3. network_object_template.conf - sample configuration object for a dynamic IP generated from file. 
 
 # Workflow.
 
 - CGF Failover triggers running of trigger_multiip_rewrite.sh shell script
 - Shell script calls multiip_object_rewrite.py 
-- multiip_object_rewrite.py  gathers information about the additional IP's on the box and updates files supporting dynamic objects
+- multiip_object_rewrite.py gathers information about the additional IP's on the box and updates files supporting dynamic objects
 
 # Installation
 

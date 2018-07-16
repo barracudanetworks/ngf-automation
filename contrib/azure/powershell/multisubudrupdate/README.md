@@ -21,6 +21,10 @@ Within this project you will find included 5 script files.
 - ngf_call_udr_webhook.py  gathers information about the cluster IP's and the local subscription and calls the Azure Automation webhook
 - NGF_UDR_Workflow.ps1 running in Azure Automation takes the information provided and updates UDR's not in the local subscription.
 
+# Updates
+The latest version will retry if it encounters a failure with the webhook call for uo to 10 times.
+
+
 # Installation
 
 

@@ -4,10 +4,10 @@
     "\\contrib",
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
-    "\\contrib\\azure\\powershell\\campus",
-    "\\contrib\\azure\\powershell\\campus\\ngfdeployment",
-    "\\contrib\\azure\\powershell\\multisubudrupdate"
+    "\\contrib\\azure\\powershell\\multisubudrupdate",
+    "\\contrib\\azure\\python",
+    "\\contrib\\azure\\python\\multi_ip_object_rewrites"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\campus\\ngfdeployment\\ngf_deploy.ps1",
+  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\ngf_call_udr_webhook.py",
   "PreviewInSolutionExplorer": false
 }

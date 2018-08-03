@@ -54,7 +54,7 @@ def main():
 	from optparse import OptionParser
 	usage = """usage: %prog [options]
 
-       example: %prog -s storageaccounname -u http://uniquewebhookurl.com/path -s UKNGFW
+       
        use of -l and -c are optional as the script already contains the default locations used by the NGF
     """
 	parser = OptionParser(usage=usage)
@@ -90,7 +90,7 @@ def main():
 		#Get's a list of box IP's, will create files to match the names in the config.
 		iplist = get_boxips(confpath,'boxnet.conf')
 
-		if len(iplist) < 2:
+		if len(iplist) < 1:
 			logger.warning("Wasn't able to collect boxips from " + confpath)
 			exit()
 

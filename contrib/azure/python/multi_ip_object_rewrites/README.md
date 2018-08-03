@@ -55,3 +55,7 @@ You should now have new object entries named after the additional IP's configure
 6. Once complete you can test this by failing over, you can view the dynamic objects and their IP's in Firewall > Forwarding Firewall Rules > Networks > Dynamic 
 
 7. Finally to use these for an outbound NAT, create a Connection Object referencing this new Single IP dynamic object and use that in the ruleset.
+
+
+#Troubleshooting
+This script will write logs into /phion0/logs/multi_ip_replace.log

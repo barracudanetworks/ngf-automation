@@ -66,7 +66,6 @@ def main():
 	parser.add_option("-s", "--servicename", default='NGFW', help="name of the NGFW service")
 	parser.add_option("-i", "--servername", default='S1', help="name of second ip address")
 	
-
 	# parse argsbox
 	(options, args) = parser.parse_args()
 
@@ -98,14 +97,13 @@ def main():
 		for section, ip in iplist.items():
 			
 			filepath = '' + confpath + 'external.' + section + '.conf'
-			logger.info("Updating" + filepath + 'with value:'+ ip )
+			logger.info('Updating ' + filepath + ' with value: '+ ip )
 			try:
 				with open(filepath, 'w+') as f:
 					f.write('IP=' + ip)
 			
 			except IOError:
 				logger.warning("Unable to create file")
-			
 
 	else:
 		logger.warning("This NGF has is not running as the active unit. Not executing script")

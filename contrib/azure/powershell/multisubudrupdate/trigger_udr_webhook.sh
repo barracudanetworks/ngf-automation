@@ -48,8 +48,7 @@ if test -n "${URL}"
 					else
 						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} 
 					fi
-				fi
-			fi
+			fi #end of if nic
 		else
 			if test -n "${NIC}"
 				then	
@@ -70,5 +69,7 @@ if test -n "${URL}"
 				fi
 				#echo URL= ${URL}
 			fi
+			#end of if NIC
 	fi	
+	#end of if service
 fi

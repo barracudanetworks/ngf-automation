@@ -1,7 +1,7 @@
 # Barracuda CloudGen Firewall: Updating dynamic objects with the IP aliases of the network interface. 
 
 ## Introduction
-This project is intended to provide an example of how you can utilise scripts on the Barracuda CloudGen Firewall to update dynamic objects and multiple ipconfigs in Azure. In Azure you can have ![multiple ip aliases attached to the NIC of a VM](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-multiple-ip-addresses-portal). 
+This project is intended to provide an example of how you can utilise scripts on the Barracuda CloudGen Firewall to update dynamic objects and multiple ipconfigs in Azure. In Azure you can have [multiple ip aliases attached to the NIC of a VM](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-multiple-ip-addresses-portal). 
 
 In this project a python script on the CGF units is triggered upon starting the virtual server (e.g. on failover or boot time) to read the configuration and adapt the dynamic object with the correct ip alias of the active CGF unit. This allows for NAT behind an IP alias for outbound connections. In Azure outbound NAT is only possible to either the load balancer public IP when there are no public IP's on the VM NIC. If there are public IP's on the VM NIC these IP's will be used. To have more public IP's we can NAT behind IP aliases on the VM NIC.
 
@@ -38,7 +38,7 @@ You should now have new object entry named after the additional IP's configured 
 	mkdir /root/azurescript
 	`
 
-To enable SSH access verify the following article on our ![campus](https://campus.barracuda.com/product/cloudgenfirewall/doc/73719781/how-to-enable-ssh-root-access-for-public-cloud-firewalls/?sl=AWUAaK0wBDp2IHciOf61&so=1) website. Password Authentication can be enabled by selecting Configuration Mode > Switch to Advanced and then opening the Advanced Settings. Make sure to add a BoxACL to limit access to SSH from specific IP's or remove access to SSH access after the changes.
+To enable SSH access verify the following article on our [campus](https://campus.barracuda.com/product/cloudgenfirewall/doc/73719781/how-to-enable-ssh-root-access-for-public-cloud-firewalls/?sl=AWUAaK0wBDp2IHciOf61&so=1) website. Password Authentication can be enabled by selecting Configuration Mode > Switch to Advanced and then opening the Advanced Settings. Make sure to add a BoxACL to limit access to SSH from specific IP's or remove access to SSH access after the changes.
 
 2. Copy the multiip_object_rewrite.py and trigger_multiip_rewrite.sh onto the CGF firewall into the azurescript folder. Do this for both CGF's!
 

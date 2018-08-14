@@ -11,6 +11,9 @@ case $i in
     -n=*|--nic=*)
     NIC="${i#*=}"
     ;;
+	-v=*|--vnet=*)
+    VNET="${i#*=}"
+    ;;
 	--default)
     DEFAULT=YES
     ;;
@@ -30,20 +33,41 @@ if test -n "${URL}"
 					#echo URL= ${URL}
 					#echo SERVICE = ${SERVICE}
 					#echo NIC = ${NIC}
-					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC}
+					if test -n "${VNET}"
+					then
+						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -n ${VNET}
+					else
+						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC}
+					fi
 				else
 					#echo URL= ${URL}
 					#echo SERVICE = ${SERVICE}
-					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} 
+					if test -n "${VNET}"
+						then
+						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE}  -n ${VNET}
+					else
+						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} 
+					fi
+				fi
 			fi
 		else
 			if test -n "${NIC}"
 				then	
-					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -i ${NIC}
 				#echo URL= ${URL}
 				#echo NIC = ${NIC}
+				if test -n "${VNET}"
+					then
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -i ${NIC} -n ${VNET}
+				else
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -i ${NIC}
+				fi
 			else
-				python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL}
+				if test -n "${VNET}"
+					then
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -n ${VNET}
+				else
+					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL}
+				fi
 				#echo URL= ${URL}
 			fi
 	fi	

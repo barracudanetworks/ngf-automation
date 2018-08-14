@@ -6,8 +6,9 @@
     "\\contrib\\azure\\powershell",
     "\\contrib\\azure\\powershell\\multisubudrupdate",
     "\\contrib\\azure\\python",
-    "\\contrib\\azure\\python\\multi_ip_object_rewrites"
+    "\\contrib\\azure\\python\\multi_ip_object_rewrites",
+    "\\contrib\\azure\\python\\multi_ip_object_rewrites\\images"
   ],
-  "SelectedNode": "\\contrib\\azure\\python\\multi_ip_object_rewrites\\README.md",
+  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\NGF_UDR_Workflow.ps1",
   "PreviewInSolutionExplorer": false
 }

@@ -80,7 +80,7 @@ def main():
 	usage = """usage: %prog [options]
 
        example: %prog -s storageaccounname -u http://uniquewebhookurl.com/path -s UKNGFW
-       use of -l and -c are optional as the script already contains the default locations used by the NGF
+       use of -l and -c are optional as the script already contains the default locations used by the CGF
     """
 	parser = OptionParser(usage=usage)
 	loglevels = ['CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG', 'NOTSET']
@@ -91,7 +91,7 @@ def main():
 	parser.add_option("-l", "--logfilepath", default='/phion0/logs/update_UDR.log', help="logfile path and name")
 	parser.add_option("-s", "--servicename", default='S1_NGFW', help="name of the NGFW service with server prepended")
 	parser.add_option("-i", "--secondip", default='', help="name of second ip address")
-
+	parser.add_option("-n", "--vnetname", default='', help="name of virtual network used for ASM")
 
 	# parse argsbox
 	(options, args) = parser.parse_args()

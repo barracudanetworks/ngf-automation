@@ -1,3 +1,4 @@
+
 <#
     .SYNOPSIS
         This Azure Automation runbook speeds up UDR failover in environments with >200 routes by switching routetables associated with subnets rather than
@@ -5,10 +6,7 @@
         
     .DESCRIPTION
        This runbook is intended to be triggered by a webhook when the NGF cluster with which it is associated fails over. 
-
-        This is a PowerShell runbook for Service Management mode, it requires the Azure module
-
-        This runbook requires the "Azure" module which are present by default in Azure Automation accounts.
+       This runbook requires the "Azure" module which are present by default in Azure Automation accounts.
 
     .PARAMETER WebhookData
         The JSON data that is passed in via the webhook call within this data the following parameters are expected
@@ -63,8 +61,8 @@ $route_suffix = "_B"
          #it doesn't need commenting out as the section under line #18 enables this
           $WebhookBody = '[
 { 
-"SubscriptionId" : "31de56f1-2378-43ae-bdf7-2c229adf2f7f",
-"id": "Group GA-NE-CLASSIC-RG GA-NE-CLASSIC-VNET",
+"SubscriptionId" : "123456789-1111-11aa-abc1-1b1b1b1b1b1b",
+"id": "YOURVNETNAME",
 "properties" :{
 	"OldNextHopIP" :  "10.9.0.5",
 	"NewNextHopIP" : "10.9.0.4"
@@ -94,7 +92,7 @@ $route_suffix = "_B"
             Write-Output "============="
             Write-Output $ConvertedJson
             Write-Output "JSON Sub" $ConvertedJson.SubscriptionId
-			if($ConvertedJson.SubscriptionId -eq "secondnic"){Write-Output "Script triggered on behalf of second NIC will act upon all Subs"}
+			
 
         }catch{
             if (!$ConvertedJson)
@@ -115,7 +113,7 @@ $route_suffix = "_B"
     $connection = Get-AutomationConnection -Name $connectionAssetName        
 
     # Authenticate to Azure with certificate
-    Write-Verbose "Get connection asset: $ConnectionAssetName" -Verbose
+    Write-Output "Get connection asset: $ConnectionAssetName" 
     $Conn = Get-AutomationConnection -Name $ConnectionAssetName
     if ($Conn -eq $null)
     {
@@ -123,19 +121,20 @@ $route_suffix = "_B"
     }
 
     $CertificateAssetName = $Conn.CertificateAssetName
-    Write-Verbose "Getting the certificate: $CertificateAssetName" -Verbose
+    Write-Output "Getting the certificate: $CertificateAssetName" 
     $AzureCert = Get-AutomationCertificate -Name $CertificateAssetName
     if ($AzureCert -eq $null)
     {
         throw "Could not retrieve certificate asset: $CertificateAssetName. Assure that this asset exists in the Automation account."
     }
 
-    Write-Verbose "Authenticating to Azure with certificate." -Verbose
+    Write-Output "Authenticating to Azure with certificate." 
     Set-AzureSubscription -SubscriptionName $Conn.SubscriptionName -SubscriptionId $Conn.SubscriptionID -Certificate $AzureCert 
     Select-AzureSubscription -SubscriptionId $Conn.SubscriptionID
 
     #Collects the vNET Name from the webhook uses the spare ID field to provide this
     $vnetName = $ConvertedJson.id
+	Write-Output "vnetName $($vnetName)" 
 
     #Get Values required for later.
     #Collects the configuration of the working VNET
@@ -144,20 +143,23 @@ $route_suffix = "_B"
 	#Get's NGF's local subscription and NextHopIP's
         $nexthopip = ($ConvertedJson | Where -Property SubscriptionId -eq $ConvertedJson.SubscriptionId | Select-Object -ExpandProperty Properties).NewNextHopIP
         $oldnexthopip = ($ConvertedJson | Where -Property SubscriptionId -eq $ConvertedJson.SubscriptionId | Select-Object -ExpandProperty Properties).OldNextHopIP
-        Write-Verbose "Old Hop IP: $($oldnexthopIP) " -Verbose
-        Write-Verbose "Next Hop IP: $($nexthopIP) " -Verbose
-        Write-Verbose "Primary NGF IP: $($primarynodeIP)" -Verbose
+        Write-Output "Old Hop IP: $($oldnexthopIP) " 
+        Write-Output "Next Hop IP: $($nexthopIP) " 
+        Write-Output "Primary NGF IP: $($primarynodeIP)" 
+
+	$splitpriip = $primarynodeIP.Split(".")
+    $splitnexthop = $nexthopip.Split(".")
 
     #This loops through the subnets in the VNET config and switches between none and suffixed route tables.
-    if($nexthopip){
+    if($nexthopip -and ($splitpriip[0] = $splitnexthop[0]) -and ($splitpriip[1] = $splitnexthop[1]) -and ($splitpriip[2] = $splitnexthop[2]) ){
         ForEach($subnet in $vnetConfig.Subnets){
-            Write-Verbose "Checking Subnet $($subnet.Name) for routes" -Verbose
+            Write-Output "Checking Subnet $($subnet.Name) for routes" 
             
             if(Get-AzureSubnetRouteTable -VirtualNetworkName $vnetName -SubnetName $subnet.Name -WarningAction SilentlyContinue -ErrorAction SilentlyContinue){
                 
                 $route = Get-AzureSubnetRouteTable -VirtualNetworkName $vnetName -SubnetName $subnet.Name
                 $routetable = Get-AzureRouteTable -Detailed -Name $route.Name
-                Write-Verbose "Found routetable $($route.Name) associated with subnet $($subnet.Name)" -Verbose
+                Write-Output "Found routetable $($route.Name) associated with subnet $($subnet.Name)" 
             
                 #If the attached route table contains the oldnexthopIP then we are making the change the right way around
                 if($routetable.Routes.NextHop.IpAddress -eq $oldnexthopIP){
@@ -168,6 +170,7 @@ $route_suffix = "_B"
                         $routeName = ($route.Name).Replace("$route_suffix",'')
                     }else{
                         $routeName = "$($route.Name)$($route_suffix)"
+						
                     }
                 #Now check that the new route table exists if it doesn't stop the script.
                     if(Get-AzureRouteTable -Name "$($routeName)"){
@@ -184,10 +187,10 @@ $route_suffix = "_B"
                             try{
                                 
                           
-                                Write-Verbose "Removing route tables from $($Subnet.Name)" -Verbose
+                                Write-Output ( "Removing route tables from $($Subnet.Name)" )
                                 if($testmode){
-                                    Write-Verbose $retryloop
-                                    Write-Verbose "Running in testmode so has not made route table changes at this time" -Verbose 
+                                    Write-Output $retryloop
+                                    Write-Output "Running in testmode so has not made route table changes at this time"  
                                     #As in testmode aborts after one loop
                                     $stoploop = $true;
                                 }else{
@@ -198,7 +201,7 @@ $route_suffix = "_B"
                             }catch{
                                 
                                 Write-Output("Attempt $($retryloop) : Failed to remove existing route $($routeName) from $($subnet.Name)")
-                                if($retryloop -eq 3){ Write-Error "Unable to remove existing route, aborting"-Verbose; $stoploop = $true; }else{$stoploop = $false;}
+                                if($retryloop -eq 3){ Write-Error "Unable to remove existing route, aborting"; $stoploop = $true; }else{$stoploop = $false;}
                                 
                             }
 
@@ -217,37 +220,37 @@ $route_suffix = "_B"
                             $Error.Clear()
                             $retryloop++;
                             try{
-                                Write-Verbose "Attaching new route $($routeName) onto $($subnet.Name)" -Verbose
+                                Write-Output("Attaching new route $($routeName) onto $($subnet.Name)")
                                 if($testmode){
-                                    Write-Verbose "Running in Simulation mode so not actually making a change" -Verbose
+                                    Write-Output("Running in Simulation mode so not actually making a change")
                                 }else{
                                     Set-AzureSubnetRouteTable -VirtualNetworkName $vnetName -SubnetName $subnet.Name -RouteTableName "$($routeName)"
                                 }
                             }catch{
-                                Write-Verbose "Failed to associate new route $($routeName) with $($subnet.Name)" -Verbose
+                                Write-Output("Failed to associate new route $($routeName) with $($subnet.Name)")
                                 $stoploop = $false;
-                                if($retryloop -eq 3){ Write-Error "Unable to add new route, aborting" -Verbose; $stoploop = $true; }else{$stoploop = $false;}
+                                if($retryloop -eq 3){ Write-Error "Unable to add new route, aborting" ; $stoploop = $true; }else{$stoploop = $false;}
                             }
                             #If there are no errors then stop the loop
                             if($Error.Count -eq 0){$stoploop = $true;}  
                         }While($stoploop = $false)
                     }else{
-                        Write-Verbose "No $($route_suffix) side route table exists called: $($routeName)" -Verbose
+                        Write-Output("No $($route_suffix) side route table exists called: $($routeName)")
                     }
                 }else{
-                    Write-Verbose "The currently attached routetable does not contain the Next Hop IP: $($oldnexthopIP)" -Verbose
+                    Write-Output("The currently attached routetable does not contain the Next Hop IP: $($oldnexthopIP)")
                 }
             }else{
-                Write-Verbose "No routetables are associated with subnet: $($subnet.Name)" -Verbose
+                Write-Output("No routetables are associated with subnet: $($subnet.Name)")
             }
         }
     }else{#If nexthopip found
-        Write-Error -Message "No nexthop IP found in webhook data"
+        Write-Error -Message "No nexthop IP found in webhook data or first 3 nexthop octets don't match PrimaryIP defined"
     }
     Write-Output ("Script execution completed")
 
 
 
 }else{
-    Write-Verbose "No Webhook data found" -Verbose
+    Write-Error -Message "No Webhook data found" 
 }

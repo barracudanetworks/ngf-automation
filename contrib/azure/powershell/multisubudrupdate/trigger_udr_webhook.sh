@@ -25,7 +25,8 @@ done
 
 if test -n "${URL}"
     then
-        
+   
+
 	if test -n "${SERVICE}"
 		then
 			if test -n "${NIC}" 
@@ -33,20 +34,23 @@ if test -n "${URL}"
 					#echo URL= ${URL}
 					#echo SERVICE = ${SERVICE}
 					#echo NIC = ${NIC}
+					
 					if test -n "${VNET}"
 					then
-						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -n ${VNET}
+						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -n "\"${VNET}\""
+						#echo VNET = ${VNET}   
 					else
-						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC}
+						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC}
 					fi
 				else
 					#echo URL= ${URL}
 					#echo SERVICE = ${SERVICE}
 					if test -n "${VNET}"
 						then
-						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE}  -n ${VNET}
+						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE}  -n "\"${VNET}\""
+						#echo VNET = ${VNET}   
 					else
-						python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -s ${SERVICE} 
+						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} 
 					fi
 			fi #end of if nic
 		else
@@ -56,16 +60,18 @@ if test -n "${URL}"
 				#echo NIC = ${NIC}
 				if test -n "${VNET}"
 					then
-					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -i ${NIC} -n ${VNET}
+					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC} -n "\"${VNET}\""
+					#echo VNET = ${VNET}   
 				else
-					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -i ${NIC}
+					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC}
 				fi
 			else
 				if test -n "${VNET}"
 					then
-					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL} -n ${VNET}
+					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -n "\"${VNET}\""
+					#echo VNET = ${VNET}   
 				else
-					python2.7 /root/azurescript/ngf_call_udr_webhook.py -u ${URL}
+					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL}
 				fi
 				#echo URL= ${URL}
 			fi

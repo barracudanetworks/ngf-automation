@@ -43,7 +43,7 @@ def get_boxip(confpath, conffile,section='boxnet'):
 	return foundip
 
 
-def call_webhook(url, subid, boxip, haip):
+def call_webhook(url, subid, id, boxip, haip):
     
 	try:
 		import requests
@@ -54,7 +54,7 @@ def call_webhook(url, subid, boxip, haip):
 
 	#print url
 
-	payload = '[{"SubscriptionId":"'+ str(subid) + '","id":"NGF","properties":{"OldNextHopIP":"'+ str(haip) + '","NewNextHopIP":"'+ str(boxip) + '"}}]'
+	payload = '[{"SubscriptionId":"'+ str(subid) + '","id":"' + str(id) + '","properties":{"OldNextHopIP":"'+ str(haip) + '","NewNextHopIP":"'+ str(boxip) + '"}}]'
 	logger.debug(payload)
 	#print payload
 
@@ -79,7 +79,7 @@ def main():
 	from optparse import OptionParser
 	usage = """usage: %prog [options]
 
-       example: %prog -s storageaccounname -u http://uniquewebhookurl.com/path -s UKNGFW
+       example: %prog -u http://uniquewebhookurl.com/path -s S1_UKNGFW
        use of -l and -c are optional as the script already contains the default locations used by the CGF
     """
 	parser = OptionParser(usage=usage)
@@ -90,8 +90,8 @@ def main():
 	parser.add_option("-c", "--configpath", default='/opt/phion/config/active/', help="source path of log files to upload")
 	parser.add_option("-l", "--logfilepath", default='/phion0/logs/update_UDR.log', help="logfile path and name")
 	parser.add_option("-s", "--servicename", default='S1_NGFW', help="name of the NGFW service with server prepended")
-	parser.add_option("-i", "--secondip", default='', help="name of second ip address")
-	parser.add_option("-n", "--vnetname", default='', help="name of virtual network used for ASM")
+	parser.add_option("-i", "--secondip", default='', help="name of second NIC ip address")
+	parser.add_option("-n", "--vnetname", default='NGF', help="name of virtual network used for ASM")
 
 	# parse argsbox
 	(options, args) = parser.parse_args()
@@ -104,6 +104,9 @@ def main():
 
 	logging.basicConfig(filename=options.logfilepath,format="%(asctime)s %(levelname)-7s - %(message)s")
 	servicename = options.servicename
+	#collects the VNET ID if provided
+	vnetname = str(options.vnetname)[1:-1]
+	logger.info("VNETName" + str(vnetname))
 
 	loopnum = 1
 	#Creates a loop so that if this fails it will repeat the attempt, will stop after 10 attempts
@@ -127,6 +130,8 @@ def main():
 			if len(boxip) < 5:
 				logger.warning("Wasn't able to collect boxip from " + confpath)
 				exit()
+
+
 
 		#New section to address dual NIC boxes where second IP is needed
 			if len(options.secondip) > 1:
@@ -183,7 +188,7 @@ def main():
 			os.remove('/tmp/cloud.conf')
 
 			logger.info("Calling the Webhook on :" + str(options.webhookurl))
-			webhook = call_webhook(options.webhookurl, str(subid)[2:-2], boxip, haip)
+			webhook = call_webhook(options.webhookurl, str(subid)[2:-2], vnetname, boxip, haip)
 		
 			logger.info(webhook)
 

@@ -11,11 +11,11 @@ The powershell is a Azure Automation workflow which should be triggered within A
 
 Within this project you will find included 5 script files. 
 
-1. CGF_call_udr_webhook.py - gathers the local CGF information and submits to Azure Webhook for firewalls on 7.1 or later firmware.
-1. CGF_call_udr_webhook_pre71.py - gathers the local CGF information and submits to Azure Webhook for firewalls on 7.0 or earlier firmware.
-2. CGF_UDR_Workflow.ps1  - Runs in Azure automation as a workflow to performed the UDR rewrites
+1. call_udr_webhook.py - gathers the local CGF information and submits to Azure Webhook for firewalls on 7.1 or later firmware.
+1. call_udr_webhook_pre71.py - gathers the local CGF information and submits to Azure Webhook for firewalls on 7.0 or earlier firmware.
+2. UDR_Workflow.ps1  - Runs in Azure automation as a workflow to performed the UDR rewrites
 3. trigger_udr_webhook.sh - used to trigger the python on the CGF.
-4. CGF_ASM_UDR_Powershell.ps1 - Runs in Azure automation as a powershell runbook (*not a workflow*)
+4. ASM_UDR_Powershell.ps1 - Runs in Azure automation as a powershell runbook (*not a workflow*)
 
 # Workflow.
 
@@ -25,8 +25,8 @@ Within this project you will find included 5 script files.
 - CGF_UDR_Workflow.ps1 running in Azure Automation takes the information provided and updates UDR's not in the local subscription.
 
 # Updates
--ASM support added
--Retry mechanism adde so the script will retry if it encounters a failure with the webhook call for up to 10 times with an increasing delay between times
+08-18 - ASM support added
+07-18 - Retry mechanism adde so the script will retry if it encounters a failure with the webhook call for up to 10 times with an increasing delay between times
 
 
 # Installation
@@ -42,11 +42,11 @@ Alternatively, if you don't want to create a key then password Authentication ca
 	mkdir /root/azurescript
 	`
 
-3. Copy the CGF_call_udr_webhook.py and trigger_udr_webhook.sh onto the CGF firewall into the azurescript folder. *Do this for both CGF's!*
+3. Copy the call_udr_webhook.py and trigger_udr_webhook.sh onto the CGF firewall into the newly created azurescript folder. *Do this for both CGF's!*
 
 4. Run the following commands to set the permissions
 	`
-	chmod 777 /root/azurescript/CGF_call_udr_webhook.py
+	chmod 777 /root/azurescript/call_udr_webhook.py
 	chmod 777 /root/azurescript/trigger_udr_webhook.sh
 	`
 
@@ -58,8 +58,9 @@ Alternatively, if you don't want to create a key then password Authentication ca
 		openssl pkcs12 -export -out arm.pfx -inkey arm.pem -in arm.pem 
 	`
 
-6. Using the Application ID you configured for Cloud Integration, search in the Azure AD section of the portal for the Application you created. Under that Application create a new Key and make a note of the value provided (as you cannot see this again)
+6. Using the Application ID you configured for Cloud Integration, search in the Azure AD section of the portal for the Application you created. Under that Application create a new key, password and make a note of the value provided (as you cannot see this again)
 ![Find Application ID in Azure](images/findappid.png)
+![Create App Password ](images/createappkey.png)
 
 7. In Azure Automation (Create an account if necessary) create a new Powershell Workflow runbook and insert the content of UDR_Workflow.ps1 . Note the Workflow name should be edited to match the name you have given the runbook in the portal.
 
@@ -73,24 +74,22 @@ Alternatively, if you don't want to create a key then password Authentication ca
 		Azure *for ASM*
 ![Module view](images/modules.png)
 
-9. In Azure Automation, Import the arm.pfx (created on the CGF previously) into Certificates
-	
-Once imported make a note of the certificate thumbprint as you will need it in the next step. 
+9. In Azure Automation, Import the arm.pfx (created on the CGF previously) into Certificates. Once imported make a note of the certificate thumbprint as you will need it in the next step. 
 
 10. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the CGF's Cloud Integration page. Except
 for the SubscriptionId which you should leave as *
 
 10a. In Azure Automation create a new variable called "CGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
 
-
 10b. Go back into and edit the runbook, change the $connectionName variable to be the name of the service principal you created.
        ` #Set this to the name of your Azure Automation Connection that works with the NGF service principal
         $connectionName = "yourconnectionName"`
 
 11. Within Azure for every subscription that you want this script to modify routes in assign the CGF Service Principal Read Access to the subscription and
- contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear
+ contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear.
 
-12. Now go into the Runbook you created and create a Webhook, take a note of the URL now! 
+12. Now go into the Runbook you created and create a Webhook, take a note of the URL now!  Set the expiry date the same as the AD Application and Certificate use.
+![Create App Password ](images/createwebhook.png)
 
 13. On the CGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
 	`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> `
@@ -98,7 +97,7 @@ for the SubscriptionId which you should leave as *
 13a. If you are running a Control Center managed CGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
 `	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -s=<SERVICENAME>`
 
-13b. If this is for ASM VNET then pass the VNET name with "-v" followed by the VNET name
+13b. If this is for ASM VNET then pass the VNET name with "-v" followed by the VNET name, enclose this in quotes if there are any spaces.
 `	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -v=<MYVNETNAME>`
 
  

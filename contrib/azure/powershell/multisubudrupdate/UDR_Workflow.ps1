@@ -9,21 +9,25 @@ workflow Update_UDR
 
             .NOTES
                 AUTHOR: Gemma Allen (gallen@barracuda.com)
-                LASTEDIT: 08 February 2018
+                LASTEDIT: 14 August 2018
                 v2 . Updated to use the REST API to make changes to the route tables rather than an inline script.
 				v2.1 Minor updates to improve debugging when API calls fail
 				v2.2 Updated to latest API for new disableBGPPropagation setting
+				v2.3 updated to add retry mechanism
         #>
     param(
     [object]$WebhookData
     )
     #This script is in test mode by default, remove the leading # to comment out lines 22,23 & 24. 
 	#fill in the details for the webhookbody with your test data if you are not using the webhook
-    #<#
+    <#
     $testmode = $true
     $webhookData = "data"
     $nowebhook = $true
     #>
+
+	#Set this to the name of your Azure Automation Connection that works with the NGF service principal
+    $connectionName = "yourconnectionName"
 
     if($webhookData -ne $null){
             
@@ -86,8 +90,6 @@ workflow Update_UDR
             }
         }
 
-        #Set this to the name of your Azure Automation Connection that works with the NGF service principal
-        $connectionName = "yourconnectionName"
         try
         {
             # Get the connection "AzureRunAsConnection "
@@ -136,7 +138,7 @@ workflow Update_UDR
                 #Authorise to the AzureAPI
                 $formData = @{
                   client_id = $servicePrincipalConnection.ApplicationID;
-                  client_secret = $(Get-AutomationVariable -Name 'NGFFailoverkey');
+                  client_secret = $(Get-AutomationVariable -Name 'CGFFailoverkey');
                   grant_type = 'client_credentials';
                   resource = "https://management.azure.com/";
 

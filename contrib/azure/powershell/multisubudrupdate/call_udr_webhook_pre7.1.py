@@ -44,7 +44,7 @@ def get_boxip(confpath, conffile):
 def call_webhook(url, subid, boxip, haip):
     
     try:
-        import requestsfg
+        import requests
     except ImportError:
         requests = None
         import urllib2

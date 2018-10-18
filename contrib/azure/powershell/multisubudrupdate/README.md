@@ -1,88 +1,115 @@
 This project is intended to provide an example of how you can utilise scripts on the Barracuda NextGen Firewall F-Series to trigger Azure
-Automation actions via Webhooks. All Python scripts are intended to be invoked on an NGF firewall via Python2.7. 
-The powershell is a Azure Automation workflow which should be triggered within Azure automation.
+Automation actions via Webhooks. 
 
-In this project the NGF triggers a webhook that triggers an Azure automation script to performs updates to user defined routes.  
-It can be used to expand the scope within which the NGF can update UDR to multiple subscriptions and multiple VNET's.
+In this project the CGF triggers a webhook that triggers an Azure automation script to performs updates to user defined routes.  
+It can be used to expand the scope within which the CGF can update UDR to multiple subscriptions and multiple VNET's. It can also be used to improve failover times in complex ASM environments or ASM peered VNET's but please review the Classic section for more details
 
 *Please note that the Standard Load Balancer feature in Azure will provide quicker and stateful failover and it the recommended HA solution for peered VNET's*
 
+All Python scripts are intended to be invoked on an CGF firewall via Python2.7. 
+The powershell is a Azure Automation workflow which should be triggered within Azure automation.
 
 Within this project you will find included 5 script files. 
 
-1. ngf_call_udr_webhook.py - gathers the local NGF information and submits to Azure Webhook. *Use the pre7.1 varient for firewalls on 7.0 or earlier firmware.*
-2. NGF_UDR_Workflow.ps1  - Runs in Azure automation as a workflow to performed the UDR rewrites
-3. trigger_udr_webhook.sh - used to trigger the python on the NGF.
+1. call_udr_webhook.py - gathers the local CGF information and submits to Azure Webhook for firewalls on 7.1 or later firmware.
+1. call_udr_webhook_pre71.py - gathers the local CGF information and submits to Azure Webhook for firewalls on 7.0 or earlier firmware.
+2. UDR_Workflow.ps1  - Runs in Azure automation as a workflow to performed the UDR rewrites
+3. trigger_udr_webhook.sh - used to trigger the python on the CGF.
+4. ASM_UDR_Powershell.ps1 - Runs in Azure automation as a powershell runbook (*not a workflow*)
 
 # Workflow.
 
-- NGF Failover triggers running of trigger_udr_webhook.sh shell script
-- Shell script calls ngf_call_udr_webhook.py 
-- ngf_call_udr_webhook.py  gathers information about the cluster IP's and the local subscription and calls the Azure Automation webhook
-- NGF_UDR_Workflow.ps1 running in Azure Automation takes the information provided and updates UDR's not in the local subscription.
+- CGF Failover triggers running of trigger_udr_webhook.sh shell script
+- Shell script calls CGF_call_udr_webhook.py 
+- CGF_call_udr_webhook.py  gathers information about the cluster IP's and the local subscription and calls the Azure Automation webhook
+- CGF_UDR_Workflow.ps1 running in Azure Automation takes the information provided and updates UDR's not in the local subscription.
+
+# Updates
+08-18 - ASM support added
+07-18 - Retry mechanism adde so the script will retry if it encounters a failure with the webhook call for up to 10 times with an increasing delay between times
+
 
 # Installation
 
 
-1. On the NGF via SSH run: 
+1. Temporarily enable SSH onto the box. Either by following the campus steps or very temporarily enabling root login and disabling Force Key Authentication. 
+To enable SSH access review the following articles on our campus website [here](https://campus.barracuda.com/product/cloudgenfirewall/doc/73719781/how-to-enable-ssh-root-access-for-public-cloud-firewalls/) and [here](https://campus.barracuda.com/product/cloudgenfirewall/doc/73719739/how-to-configure-ssh). 
+Alternatively, if you don't want to create a key then password Authentication can be enabled by selecting Configuration Mode > Switch to Advanced and then opening the Advanced Settings. Make sure to add a BoxACL to limit access to SSH from specific IP's or remove access to SSH access after the changes.
+
+
+2. On the CGF via SSH run: 
 	`
 	mkdir /root/azurescript
 	`
 
-2. Copy the ngf_call_udr_webhook.py and trigger_udr_webhook.sh onto the NGF firewall into the azurescript folder. Do this for both NGF's!
+3. Copy the call_udr_webhook.py and trigger_udr_webhook.sh onto the CGF firewall into the newly created azurescript folder. *Do this for both CGF's!*
 
-3. Run the following commands to set the permissions
+4. Run the following commands to set the permissions
 	`
-	chmod 777 /root/azurescript/ngf_call_udr_webhook.py
+	chmod 777 /root/azurescript/call_udr_webhook.py
 	chmod 777 /root/azurescript/trigger_udr_webhook.sh
 	`
 
+*Complete Step 7a and 12 onwards if deploying for ASM only.*	
 
-4. From the NGF get the arm.pfx you would have created to configure Cloud Integration. 
-5. Find your Application in the Azure AD section of the portal. Under that Application create a new Key and make a note of the value provided (as you cannot see this again)
+5. From the CGF download the arm.pfx you created in order to configure Cloud Integration. If you don't have the pfx on the CGF you can use open SSL to convert the PEM to PFX.
+	`
+	Convert your PEM's to PFX on the CGF via;
+		openssl pkcs12 -export -out arm.pfx -inkey arm.pem -in arm.pem 
+	`
 
-6. In Azure Automation (Create an account if necessary) create a new Powershell Workflow runbook and provide the content of UDR_Webhook.ps1 . Note the Workflow name should be edited to match the name you create in the portal
-7. In Azure Automation go into Modules and Browse the Gallery, then import the latest of the following at least;
+6. Using the Application ID you configured for Cloud Integration, search in the Azure AD section of the portal for the Application you created. Under that Application create a new key, password and make a note of the value provided (as you cannot see this again)
+![Find Application ID in Azure](images/findappid.png)
+![Create App Password ](images/createappkey.png)
+
+7. In Azure Automation (Create an account if necessary) create a new Powershell Workflow runbook and insert the content of UDR_Workflow.ps1 . Note the Workflow name should be edited to match the name you have given the runbook in the portal.
+
+7a. For ASM in Azure Automation (Create an account if necessary) create a new Powershell Runbook and insert the content of ASM_UDR_Powershell.ps1
+
+8. In Azure Automation go into Modules and Browse the Gallery and make sure you have at least the below 4;
 		AzureRM.profile
 		AzureRM.resources
 		AzureRM.Network
 		AzureRM.Automation
-8. In Azure Automation, Import the arm.pfx (created on the NGF previously) into the automation Accounts Certificates
-	Convert your PEM's to PFX on the NGF via;
-	openssl pkcs12 -export -out arm.pfx -inkey arm.pem -in arm.pem 
-Once imported make a note of the certificate thumbprint as you will need it in the next step. 
+		Azure *for ASM*
+![Module view](images/modules.png)
 
-9. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the NGF's Cloud Integration page. Except
+9. In Azure Automation, Import the arm.pfx (created on the CGF previously) into Certificates. Once imported make a note of the certificate thumbprint as you will need it in the next step. 
+
+10. In Azure Automation, Create a new Connection of type Azure ServicePrincipal and populate with the same values as the CGF's Cloud Integration page. Except
 for the SubscriptionId which you should leave as *
 
-9a. If using the v2 of this script then in Azure Automation create a new variable called "NGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
-If you wish to use a different name then edit line #136 of the v2 powershell to use the new variable name.
+10a. In Azure Automation create a new variable called "CGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
 
-9b. Go back into and edit the runbook, change the $connectionName = to be the name of the service principal you created
+10b. Go back into and edit the runbook, change the $connectionName variable to be the name of the service principal you created.
+       ` #Set this to the name of your Azure Automation Connection that works with the NGF service principal
+        $connectionName = "yourconnectionName"`
 
-10. Now go into the Runbook you created and create a Webhook, take a note of the URL now!
+11. Within Azure for every subscription that you want this script to modify routes in assign the CGF Service Principal Read Access to the subscription and
+ contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear.
 
-11. On the NGF, via SSH, using vi or your preferred editor edit trigger_udr_webhook.sh to provide the URL of the webhook, 
-(further input options can be collected by running python2.7 ngf_call_udr_webhook.py --help)
-			`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> `
-	
-12. On the NGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
+12. Now go into the Runbook you created and create a Webhook, take a note of the URL now!  Set the expiry date the same as the AD Application and Certificate use.
+![Create App Password ](images/createwebhook.png)
+
+13. On the CGF go into Configuration Tree, Virtual Services, S1, Properties and to the Startup Script add;
 	`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> `
-	
-12a. If you are running a Control Center managed NGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
+
+13a. If you are running a Control Center managed CGF then also provide the name of the NGFW service by passing the parameter "-s" followed by the service name. e.g 
 `	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -s=<SERVICENAME>`
 
-13. For each additional subscription that you want access into assign the NGF Service Principal Read Access to the subscription and
- contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear
+13b. If this is for ASM VNET then pass the VNET name with "-v" followed by the VNET name, enclose this in quotes if there are any spaces.
+`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -v=<MYVNETNAME>`
+
  
-14. For testing within the Azure Automation powershell you have two sections lines #19 - 23 enables the script in test mode in which it won't make any changes and will print all debug.
-These lines can be commented out to allow the script to make changes. If this section is enabled then the values it takes are manually provided within the script a little further down at line 
-43-48 you can provide the details that the NGF would provide. IP's and Subscription ID.  
-		
+14. By default the script is in testmode, you can per the screenshot below comment out this section to allow the script to make changes. To run in production with changes being made then comment out these 3 lines.  
+![Testmode lines in script](images/testmode.png)
+
+To supply test data without invoking the script from the CGF then you can edit the test data to mimic your clusters details. To use these values ensure $nowebhook is set to $true in the section mentioned above.
+![Test data lines in script](images/testdata.png)		
 
 Notes. 
 
-By default this script doesn't try to interact with the subscription that the NGF is located in, to allow it to do this uncomment line 166 & 238 of NGF_UDR_Workflow.ps1
+By default this script doesn't try to interact with the subscription that the CGF is located in, to allow it to do this uncomment line 166 & 238 of CGF_UDR_Workflow.ps1
 
 # Multi NIC.
 
@@ -92,6 +119,17 @@ So if you have a multi-NIC device in Control Center then an example command woul
 `	/root/azurescript/trigger_udr_webhook.sh -u=http://url -s=SERVICE1 -n=eth1 `
 The value of this parameter should be the name you give to the additional IP on the box (please make sure they are the same name for both Network and HA Network)
 The script will look these up and trigger the automation twice, once for each NIC pair. 
+
+# Classic (Azure Service Management)
+This script can be used to enhance failover speed for complex ASM environments or perform failover for peered VNET's in Classic subscriptions. The script operates on the pricipal that two route tables have been configured
+one with NextHopIP's pointing at the primary FW IP and another set pointing at the secondary FW IP. The second set of routes is expected to share the same name as the first except for a suffix to identify them as belonging to the secondary.
+For example;
+routetable_1 points to the primary and routetable_1_B would point to the secondary. This script will then operate to detach and attach the appropriate route table depending which unit is active
+
+The powershell has been written to keep the scripts on the CGF transferable between ARM and ASM and also to allow for both to be triggered if needed. 
+
+If you wanted to trigger both a ASM and ARM automation rewrite from the same cluster it is just a case of repeating step 12 so that the Startup Script calls upon the automation twice.
+
 
 # Troubleshooting.
 Issues can occur in a few locations the below guide should help you identify which area is preventing the script from completing succesfully. 

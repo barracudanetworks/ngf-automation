@@ -116,11 +116,15 @@ def main():
 		
 		#increases the wait period between loops so 2nd loop runs 30 seconds after the first, 2nd loop is 60 seconds, 3rd is 90 seconds, so last loop is 4 and a half minutes delay over the previous.
 		sleeptime = 30 * loopnum
+		#pauses between loops , this is at the front to allow some margin on trigger for temporary Azure network losses which are sometimes seen.
+		logger.info("Sleeping for " + str(sleeptime))
+		time.sleep(sleeptime)
+
 		logger.info("UDR Webhook script triggered, iteration number:" + str(loopnum))
 		
 		#decides if the box is the active unit
-		if(commands.getoutput('ps -fC '+ servicename).find(servicename) != -1):
-			logger.info("This NGF has been detected as active" + str(commands.getoutput('ps -fC '+ servicename)))
+		if(commands.getoutput('phionctrl server show').find('active=1') != -1):
+			logger.info("This NGF has been detected as active" + str(commands.getoutput('phionctrl server show')))
 			confpath = options.configpath
 		#Get's the configuration files for HA  
 		#The boxip is the IP taken from the local network config file. On failover this should be the IP of the active box.     
@@ -210,9 +214,7 @@ def main():
 					else:
 						logger.warning("failure to get status from webhook:" + webhook )
 			
-			#pauses between loops 
-			logger.info("Sleeping for " + str(sleeptime))
-			time.sleep(sleeptime)
+			
 			#If this is the 10th loop or if the webhook is successful then stops the loop condition being true
 			if (loopnum == 10):
 				condition = False

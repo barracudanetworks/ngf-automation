@@ -27,7 +27,7 @@ Within this project you will find included 5 script files.
 # Updates
 08-18 - ASM support added
 07-18 - Retry mechanism adde so the script will retry if it encounters a failure with the webhook call for up to 10 times with an increasing delay between times
-
+11-18 - adjustment to retry mech. to accomodate potential split brain on very short network interuptions.
 
 # Installation
 

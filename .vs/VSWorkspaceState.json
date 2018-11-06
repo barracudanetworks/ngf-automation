@@ -4,13 +4,12 @@
     "\\contrib",
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
-    "\\contrib\\azure\\powershell\\module",
     "\\contrib\\azure\\powershell\\multisubudrupdate",
     "\\contrib\\azure\\powershell\\multisubudrupdate\\images",
     "\\contrib\\azure\\python",
     "\\contrib\\azure\\python\\multi_ip_object_rewrites",
     "\\contrib\\azure\\python\\multi_ip_object_rewrites\\images"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\module",
+  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\call_udr_webhook.py",
   "PreviewInSolutionExplorer": false
 }

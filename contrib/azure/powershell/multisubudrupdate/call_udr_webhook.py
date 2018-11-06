@@ -9,17 +9,18 @@ import time
 logger = logging.getLogger(__name__)
 
 
-#Parsing config files for the NGF network needs to only read the boxnet configuration
+#Parsing config files for the NGF network needs to only read the boxnet
+#configuration
 def read_boxnet(filename,confsec):
 	import StringIO
 	boxnet = StringIO.StringIO()
 
-	boxnet.write("["+confsec+"]\n")
+	boxnet.write("[" + confsec + "]\n")
 	try:
 		with open(filename) as infile:
 			copy = False
 			for line in infile:
-				if line.strip() == "["+confsec+"]":
+				if line.strip() == "[" + confsec + "]":
 					copy = True
 				elif line.strip() == "":
 					copy = False
@@ -54,11 +55,11 @@ def call_webhook(url, subid, id, boxip, haip):
 
 	#print url
 
-	payload = '[{"SubscriptionId":"'+ str(subid) + '","id":"' + str(id) + '","properties":{"OldNextHopIP":"'+ str(haip) + '","NewNextHopIP":"'+ str(boxip) + '"}}]'
+	payload = '[{"SubscriptionId":"' + str(subid) + '","id":"' + str(id) + '","properties":{"OldNextHopIP":"' + str(haip) + '","NewNextHopIP":"' + str(boxip) + '"}}]'
 	logger.debug(payload)
 	#print payload
 
-    # POST with JSON 
+    # POST with JSON
 	if requests:
 			r = requests.post(url, data=json.dumps(payload))
 	else:
@@ -85,7 +86,7 @@ def main():
 	parser = OptionParser(usage=usage)
 	loglevels = ['CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG', 'NOTSET']
 	parser.add_option("-v", "--verbosity", default="info",
-						help="available loglevels: %s [default: %%default]"%','.join(l.lower() for l in loglevels))
+						help="available loglevels: %s [default: %%default]" % ','.join(l.lower() for l in loglevels))
 	parser.add_option("-u", "--webhookurl", default='', help="URL of automation webhook")
 	parser.add_option("-c", "--configpath", default='/opt/phion/config/active/', help="source path of log files to upload")
 	parser.add_option("-l", "--logfilepath", default='/phion0/logs/update_UDR.log', help="logfile path and name")
@@ -109,14 +110,18 @@ def main():
 	logger.info("VNETName" + str(vnetname))
 
 	loopnum = 1
-	#Creates a loop so that if this fails it will repeat the attempt, will stop after 10 attempts
+	#Creates a loop so that if this fails it will repeat the attempt, will stop
+	#after 10 attempts
 	condition = True
 	while condition:
 
 		
-		#increases the wait period between loops so 2nd loop runs 30 seconds after the first, 2nd loop is 60 seconds, 3rd is 90 seconds, so last loop is 4 and a half minutes delay over the previous.
+		#increases the wait period between loops so 2nd loop runs 30 seconds after
+		#the first, 2nd loop is 60 seconds, 3rd is 90 seconds, so last loop is 4 and
+		#a half minutes delay over the previous.
 		sleeptime = 30 * loopnum
-		#pauses between loops , this is at the front to allow some margin on trigger for temporary Azure network losses which are sometimes seen.
+		#pauses between loops , this is at the front to allow some margin on trigger
+		#for temporary Azure network losses which are sometimes seen.
 		logger.info("Sleeping for " + str(sleeptime))
 		time.sleep(sleeptime)
 
@@ -126,8 +131,9 @@ def main():
 		if(commands.getoutput('phionctrl server show').find('active=1') != -1):
 			logger.info("This NGF has been detected as active" + str(commands.getoutput('phionctrl server show')))
 			confpath = options.configpath
-		#Get's the configuration files for HA  
-		#The boxip is the IP taken from the local network config file. On failover this should be the IP of the active box.     
+		#Get's the configuration files for HA
+		#The boxip is the IP taken from the local network config file.  On failover
+		#this should be the IP of the active box.
 
 			boxip = get_boxip(confpath,'boxnet.conf')
 
@@ -139,13 +145,14 @@ def main():
 
 		#New section to address dual NIC boxes where second IP is needed
 			if len(options.secondip) > 1:
-				secondboxip = get_boxip(confpath,'boxnet.conf','addnet_'+options.secondip)
+				secondboxip = get_boxip(confpath,'boxnet.conf','addnet_' + options.secondip)
 
 			if len(boxip) < 5:
-				logger.warning("Wasn't able to collect second boxip from " + confpath )
+				logger.warning("Wasn't able to collect second boxip from " + confpath)
 				exit()
 
-		#The boxip is the IP taken from the ha network config file. Clusters reverse this pair of files so this should be the other box.  
+		#The boxip is the IP taken from the ha network config file.  Clusters reverse
+		#this pair of files so this should be the other box.
 
 			haip = get_boxip(confpath,'boxnetha.conf')
 
@@ -155,7 +162,7 @@ def main():
 
 			#New section to address dual NIC boxes where second IP is needed
 			if len(options.secondip) > 1:
-				secondhaip = get_boxip(confpath,'boxnetha.conf','addnet_'+options.secondip)
+				secondhaip = get_boxip(confpath,'boxnetha.conf','addnet_' + options.secondip)
 
 				if len(boxip) < 5:
 					logger.warning("Wasn't able to collect HA second boxip from " + confpath)
@@ -167,7 +174,8 @@ def main():
 			with open(confpath + 'cloudintegration.conf', 'r') as f:
 				config_string = '[dummy_section]\n' + f.read()
 
-			#creates a temp file for conf parser to read that contains the dummy section header.
+			#creates a temp file for conf parser to read that contains the dummy section
+			#header.
 			with open('/tmp/cloud.conf', 'a') as the_file:
 				the_file.write(config_string)
 
@@ -202,7 +210,7 @@ def main():
 				if (json.loads(webhook)['JobIds']):
 					logger.info("Success JobID:" + (str(json.loads(webhook)['JobIds'])[2:-2]))
 				else:
-					logger.warning("failure to get status from webhook:" + webhook )
+					logger.warning("failure to get status from webhook:" + webhook)
 
 				if len(options.secondip) > 1:
 					logger.info("Second IP address provided and found")
@@ -212,10 +220,11 @@ def main():
 					if (json.loads(webhook)['JobIds']):
 						logger.info("Success JobID:" + (str(json.loads(webhook)['JobIds'])[2:-2]))
 					else:
-						logger.warning("failure to get status from webhook:" + webhook )
+						logger.warning("failure to get status from webhook:" + webhook)
 			
 			
-			#If this is the 10th loop or if the webhook is successful then stops the loop condition being true
+			#If this is the 10th loop or if the webhook is successful then stops the
+			#loop condition being true
 			if (loopnum == 10):
 				condition = False
 
@@ -223,8 +232,7 @@ def main():
 
 		else:
 			logger.warning("This NGF has is not running as the active unit. Not executing script")
-			condition=False
+			condition = False
 	#end of loop
-
-if __name__=="__main__":
+if __name__ == "__main__":
 	exit(main())

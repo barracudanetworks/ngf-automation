@@ -128,8 +128,8 @@ def main():
 		logger.info("UDR Webhook script triggered, iteration number:" + str(loopnum))
 		
 		#decides if the box is the active unit
-		if(commands.getoutput('phionctrl server show').find('active=1') != -1):
-			logger.info("This NGF has been detected as active" + str(commands.getoutput('phionctrl server show')))
+		if(commands.getoutput('ps -fC '+ servicename).find(servicename) != -1):
+			logger.info("This NGF has been detected as active" + str(commands.getoutput('ps -fC '+ servicename)))
 			confpath = options.configpath
 		#Get's the configuration files for HA
 		#The boxip is the IP taken from the local network config file.  On failover

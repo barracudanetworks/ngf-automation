@@ -214,7 +214,7 @@ def main():
 
 				if len(options.secondip) > 1:
 					logger.info("Second IP address provided and found")
-					webhook = call_webhook(options.webhookurl, "secondnic", secondboxip, secondhaip)
+					webhook = call_webhook(options.webhookurl, "secondnic", vnetname, secondboxip, secondhaip)
 					logger.info("Calling the Webhook on :" + str(options.webhookurl))
 
 					if (json.loads(webhook)['JobIds']):

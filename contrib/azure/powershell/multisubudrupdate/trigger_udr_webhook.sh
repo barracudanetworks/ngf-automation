@@ -14,11 +14,14 @@ case $i in
 	-v=*|--vnet=*)
     VNET="${i#*=}"
     ;;
+	-d=*|--down=*)
+    DOWN="${i#*=}"
+    ;;
 	--default)
     DEFAULT=YES
     ;;
     *)
-            # unknown option
+            # unknown option 
     ;;
 esac
 done
@@ -26,7 +29,6 @@ done
 if test -n "${URL}"
     then
    
-
 	if test -n "${SERVICE}"
 		then
 			if test -n "${NIC}" 
@@ -34,23 +36,44 @@ if test -n "${URL}"
 					#echo URL= ${URL}
 					#echo SERVICE = ${SERVICE}
 					#echo NIC = ${NIC}
+					#echo DOWN = ${DOWN}
 					
 					if test -n "${VNET}"
 					then
-						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -n "\"${VNET}\""
+						if test -n "${DOWN}"
+						then
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -n "\"${VNET}\"" -d ${DOWN}
+						else
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -n "\"${VNET}\""
+						fi
 						#echo VNET = ${VNET}   
 					else
-						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC}
+						if test -n "${DOWN}"
+						then
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -d ${DOWN}
+						else
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC}
+						fi
 					fi
 				else
 					#echo URL= ${URL}
 					#echo SERVICE = ${SERVICE}
 					if test -n "${VNET}"
 						then
-						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE}  -n "\"${VNET}\""
-						#echo VNET = ${VNET}   
+							if test -n "${DOWN}"
+							then
+								python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -i ${NIC} -d ${DOWN}
+							else
+								python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE}  -n "\"${VNET}\""
+								#echo VNET = ${VNET}
+							fi
 					else
-						python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} 
+						if test -n "${DOWN}"
+						then
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} -d ${DOWN}
+						else
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -s ${SERVICE} 
+						fi
 					fi
 			fi #end of if nic
 		else
@@ -60,22 +83,42 @@ if test -n "${URL}"
 				#echo NIC = ${NIC}
 				if test -n "${VNET}"
 					then
-					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC} -n "\"${VNET}\""
-					#echo VNET = ${VNET}   
+					if test -n "${DOWN}"
+						then
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC} -n "\"${VNET}\"" -d ${DOWN}
+						else
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC} -n "\"${VNET}\""
+						fi
+					  #echo VNET = ${VNET} 
 				else
-					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC}
+					if test -n "${DOWN}"
+						then
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC} -d ${DOWN}
+						else
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -i ${NIC}
+						fi
 				fi
 			else
 				if test -n "${VNET}"
 					then
-					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -n "\"${VNET}\""
+						if test -n "${DOWN}"
+						then
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -n "\"${VNET}\"" -d ${DOWN}
+						else
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -n "\"${VNET}\""
+						fi
 					#echo VNET = ${VNET}   
 				else
-					python2.7 /root/azurescript/call_udr_webhook.py -u ${URL}
+					if test -n "${DOWN}"
+						then
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL} -d ${DOWN}
+						else
+							python2.7 /root/azurescript/call_udr_webhook.py -u ${URL}
+						fi
 				fi
 				#echo URL= ${URL}
 			fi
 			#end of if NIC
 	fi	
-	#end of if service
+	#end of if service 
 fi

@@ -7,7 +7,7 @@ It can be used to expand the scope within which the CGF can update UDR to multip
 *Please note that the Standard Load Balancer feature in Azure will provide quicker and stateful failover and it the recommended HA solution for peered VNET's*
 
 All Python scripts are intended to be invoked on an CGF firewall via Python2.7. 
-The powershell is a Azure Automation workflow which should be triggered within Azure automation.
+The powershell is a Azure Automation workflow which should be triggered within Azure automation. It is not yet intended to run on the new Azure powershell
 
 Within this project you will find included 5 script files. 
 
@@ -28,6 +28,10 @@ Within this project you will find included 5 script files.
 08-18 - ASM support added
 07-18 - Retry mechanism adde so the script will retry if it encounters a failure with the webhook call for up to 10 times with an increasing delay between times
 11-18 - adjustment to retry mech. to accomodate potential split brain on very short network interuptions.
+02-19 - -d YES option added to have stopping box push routes away. Update to ps1 as Find-AzureRMResources command depreciated. 
+
+#Upgrading
+If you are upgrading from a previous version, in particular you will need to replace the call_udr_webhook.py, trigger_udr_webhook.sh and review steps 10b & 14
 
 # Installation
 
@@ -81,11 +85,14 @@ for the SubscriptionId which you should leave as *
 
 10a. In Azure Automation create a new variable called "CGFFailoverkey" and set it's encyrpted value to be the key value from Step 4a.
 
-10b. Go back into and edit the runbook, change the $connectionName variable to be the name of the service principal you created.
-       ` #Set this to the name of your Azure Automation Connection that works with the NGF service principal
+10b. Go back into and edit the runbook, change the $connectionName variable to be the name of the service principal you created. Update the $ResourceGroup and $AutomationAccount 
+variables to match those that this is running in. 
+       ` #Set this to the name of your Azure Automation Connection that works with the CGF service principal
         $connectionName = "yourconnectionName"`
+		$ResourceGroup = "<YOURAUTOMATIONRESOURCEGROUP>"
+		$AutomationAccount = "<YOURAUTOMATIONACCOUNT>"
 
-11. Within Azure for every subscription that you want this script to modify routes in assign the CGF Service Principal Read Access to the subscription and
+11. Within Azure's IAM for every subscription that you want this script to modify routes in assign the CGF Service Principal Read Access to the subscription and
  contributor/owner access to the resource group containing the VNET and routes. Be patient sometimes this get's cached so you may need to wait for this to clear.
 
 12. Now go into the Runbook you created and create a Webhook, take a note of the URL now!  Set the expiry date the same as the AD Application and Certificate use.
@@ -100,8 +107,12 @@ for the SubscriptionId which you should leave as *
 13b. If this is for ASM VNET then pass the VNET name with "-v" followed by the VNET name, enclose this in quotes if there are any spaces.
 `	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -v=<MYVNETNAME>`
 
+14. To protect better against split brain loss of contact between Firewalls add to the Stop Script the same command as you place in Startup Script but appended with;
+	`-d=YES & `
+So;
+`	/root/azurescript/trigger_udr_webhook.sh -u=<url to webhook> -v=<MYVNETNAME> -d=YES & `
  
-14. By default the script is in testmode, you can per the screenshot below comment out this section to allow the script to make changes. To run in production with changes being made then comment out these 3 lines.  
+15. By default the script is in testmode, you can per the screenshot below comment out this section to allow the script to make changes. To run in production with changes being made then comment out these 3 lines.  
 ![Testmode lines in script](images/testmode.png)
 
 To supply test data without invoking the script from the CGF then you can edit the test data to mimic your clusters details. To use these values ensure $nowebhook is set to $true in the section mentioned above.
@@ -136,3 +147,4 @@ Issues can occur in a few locations the below guide should help you identify whi
 
 1. Permissions - if the script cannot see any route tables check that the permissions are correctly assigned to the subscription, route tables and the script is using the correct ones in the automation account
 2. Test Mode - to prevent inadvertent damage the script defaults to test mode, but make sure you turn this off before you go live.
+3. The powershell is updated to v6 but the previous generations command is still present on line 184 in case an Error with Get-AzureRMResources or Find-AzureRMResources occurs.

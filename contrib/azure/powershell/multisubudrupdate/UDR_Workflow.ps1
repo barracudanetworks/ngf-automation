@@ -9,25 +9,29 @@ workflow Update_UDR
 
             .NOTES
                 AUTHOR: Gemma Allen (gallen@barracuda.com)
-                LASTEDIT: 14 August 2018
+                LASTEDIT: 1st Feb 2019
                 v2 . Updated to use the REST API to make changes to the route tables rather than an inline script.
 				v2.1 Minor updates to improve debugging when API calls fail
 				v2.2 Updated to latest API for new disableBGPPropagation setting
 				v2.3 updated to add retry mechanism
+				v2.4 minor changes to logic to reduce multiple runnings of the same change
         #>
     param(
     [object]$WebhookData
     )
     #This script is in test mode by default, remove the leading # to comment out lines 22,23 & 24. 
 	#fill in the details for the webhookbody with your test data if you are not using the webhook
-    <#
+    #<#
     $testmode = $true
     $webhookData = "data"
     $nowebhook = $true
     #>
 
 	#Set this to the name of your Azure Automation Connection that works with the NGF service principal
-    $connectionName = "yourconnectionName"
+    $connectionName = "<YOURCONNECTIONNAME>"
+    $ResourceGroup = "<YOURAUTOMATIONRESOURCEGROUP>"
+    $AutomationAccount = "<YOURAUTOMATIONACCOUNT>"
+
 
     if($webhookData -ne $null){
             
@@ -45,11 +49,11 @@ workflow Update_UDR
          #it doesn't need commenting out as the section under line #18 enables this
           $WebhookBody = '[
 { 
-"SubscriptionId" : "a31de56f1-2324-43ae-bdf7-2c229adf2f7f",
+"SubscriptionId" : "1sa1a1dads27-497b-a6f2-7a7bf731c43b",
 "id": "NGF",
 "properties" :{
-	"OldNextHopIP" :  "10.2.0.8",
-	"NewNextHopIP" : "10.2.0.7"
+	"OldNextHopIP" :  "172.16.136.5",
+	"NewNextHopIP" : "172.16.136.4"
 }
 }
 ]'
@@ -123,11 +127,16 @@ workflow Update_UDR
         $oldhopip = ($ConvertedJson | Where -Property SubscriptionId -eq $ConvertedJson.SubscriptionId | Select-Object -ExpandProperty Properties).OldNextHopIP
         Write-Output = "Old Hop IP: $oldhopip "
         Write-Output = "Next Hop IP: $nexthopip "
+
+        $existing_status = (Get-AzureRmAutomationVariable -Name Update_UDR_status -ResourceGroupName $ResourceGroup -AutomationAccountName $AutomationAccount).Value
+        Write-Output "Collected existing status of: $existing_status"
+
         
-		#Not much point continuing without an IP to change to
-		if($nexthopip){
+		#if and IP is provided and it's not exactly the same as another script that's running currently
+		if($nexthopip -and ($existing_status -ne "running:$($oldhopip):$($nexthopip)")){
 			$subscriptions = Get-AzureRMSubscription -WarningAction 'silentlycontinue'
-		   # Write-Output $subscriptions
+            Set-AzureRmAutomationVariable -Name "Update_UDR_status" -ResourceGroupName $ResourceGroup -AutomationAccountName $AutomationAccount -Value "running:$($oldhopip):$($nexthopip)" -Encrypted $false
+		    Write-Output "Updating status variable with running:$($oldhopip):$($nexthopip)"
 
 			ForEach($sub in $subscriptions){
             
@@ -138,7 +147,7 @@ workflow Update_UDR
                 #Authorise to the AzureAPI
                 $formData = @{
                   client_id = $servicePrincipalConnection.ApplicationID;
-                  client_secret = $(Get-AutomationVariable -Name 'CGFFailoverkey');
+                  client_secret = $(Get-AutomationVariable -Name 'NGFFailoverkey');
                   grant_type = 'client_credentials';
                   resource = "https://management.azure.com/";
 
@@ -171,7 +180,10 @@ workflow Update_UDR
 				if($sub.SubscriptionId -ne $ConvertedJson.SubscriptionId){
                 
 	                    #Reviews the properties and ensures the route tables only get selected which contain the old firewall IP.
-                        $Resources = Find-AzureRmResource -ResourceType "Microsoft.Network/routeTables" -ExpandProperties | Where-Object -FilterScript {$_.Properties.routes.properties.nextHopIpAddress -eq "$oldhopip"} | Select ResourceName, ResourceType, ResourceId, SubscriptionId, ResourceGroupName
+                        
+						#$Resources = Find-AzureRmResource -ResourceType "Microsoft.Network/routeTables" -ExpandProperties | Where-Object -FilterScript {$_.Properties.routes.properties.nextHopIpAddress -eq "$oldhopip"} | Select ResourceName, ResourceType, ResourceId, SubscriptionId, ResourceGroupName
+                        #For newer versions use the below, for old use the above.
+                        $Resources = Get-AzureRmResource -ODataQuery "`$filter=resourcetype eq 'Microsoft.Network/routeTables'" -ExpandProperties | Where-Object -FilterScript {$_.Properties.routes.properties.nextHopIpAddress -eq "$oldhopip"} | Select ResourceName, ResourceType, ResourceId, SubscriptionId, ResourceGroupName
                         
                         if($Resources.Length -eq 0){
                             Write-Warning ("No Routetables found containing " + $oldhopip + "so script aborting")
@@ -221,9 +233,7 @@ workflow Update_UDR
                                             #Write-Output($routechange)
 										}else{
                                             if(!$testmode){
-                                                
-                                            
-											Write-Output("This runbook didn't update because: " + $results )
+    											Write-Output("This runbook didn't update because: " + $results )
                                             }
 										}
   
@@ -237,14 +247,19 @@ workflow Update_UDR
                                 #Empties resources of values before the next Sub get's queried.
                                 $Resources=""
 								Write-Output ("Script completed")
+                                
+                            
                                 }
 						  #}#End foreach RG
 				}else{Write-Warning -Message "Not acting as this subscription is under NGF management"} #End if not local subscription
-			}#End subscriptions foreach
+			}        #End subscriptions foreach
+            Set-AzureRmAutomationVariable -Name "Update_UDR_status" -ResourceGroupName $ResourceGroup -AutomationAccountName $AutomationAccount -Value "completed:$($oldhopip):$($nexthopip)" -Encrypted $false
 		}else{#If nexthopip found
-			Write-Error -Message "No nexthop IP found in webhook data"
+			Write-Error -Message "No nexthop IP found in webhook data or script running: $($existing_status)"
+            Set-AzureRmAutomationVariable -Name "Update_UDR_status" -ResourceGroupName $ResourceGroup -AutomationAccountName $AutomationAccount -Value "failed" -Encrypted $false
 		}
     }else{
-        Write-Error -Message "This runbook is intented to be started by webhook only" 
+        Write-Error -Message "This runbook is intended to be started by webhook only" 
+        Set-AzureRmAutomationVariable -Name "Update_UDR_status" -ResourceGroupName $ResourceGroup -AutomationAccountName $AutomationAccount -Value "failed" -Encrypted $false
     }#end if webhook data
 }

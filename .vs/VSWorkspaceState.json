@@ -4,12 +4,10 @@
     "\\contrib",
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
-    "\\contrib\\azure\\powershell\\campus",
-    "\\contrib\\azure\\powershell\\module",
-    "\\contrib\\azure\\python",
-    "\\contrib\\azure\\python\\multi_ip_object_rewrites",
-    "\\contrib\\azure\\python\\multi_ip_object_rewrites\\images"
+    "\\contrib\\azure\\powershell\\multisubudrupdate",
+    "\\contrib\\azure\\powershell\\udrsync",
+    "\\contrib\\azure\\python"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\module\\README.md",
+  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\AzureStack_Workflow.ps1",
   "PreviewInSolutionExplorer": false
 }

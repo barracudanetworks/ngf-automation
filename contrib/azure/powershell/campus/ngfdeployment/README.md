@@ -17,10 +17,11 @@ To organize the resources in the cloud, it is recommend to use multiple resource
 
 
 ## Required Azure PowerShell Version
-Use Azure PowerShell 4.3.1 or newer. If in doubt always use the latest Azure PowerShell version.
-Check the PowerShell version with the following command:
+There are two versions of this script, ngf_deploy_azurerm.ps1 for Powershell AzureRM modules, and ngf_deploy_az.ps1 for the newest Az module.
+Use Azure PowerShell AzureRM 4.3.1 or newer or Az 2.2.0 or newer. If in doubt always use the latest Azure PowerShell version.
+Check the PowerShell versions with the following commands:
 ```
-Get-Module -ListAvailable -Name AzureRM -Refresh
+Get-InstalledModule -Name AzureRM,Az
 ```
 ## Step-by-Step Instructions on Barracuda Campus
 Fill in the variables at the top of the script to match your setup. For more in depth instructions follow the instructions on Barracuda Campus.
@@ -28,6 +29,8 @@ For more information, see [Barracuda Campus](https://campus.barracuda.com/produc
 
 For deployments in regions without Marketplace first complete the instructions to upload a VHD into Azure for use with ARM and then use this script.
 https://campus.barracuda.com/product/cloudgenfirewall/doc/53248361/how-to-upload-azure-vhd-images-for-user-defined-images-using-arm/
+
+If the $lbSku variable is set to Standard then the CGF will deploy an internal and external Standard LB with basic access rules.
 
 For WAF deployments this script will create the load balancer as well as access and management rules through the load balancer. 
 

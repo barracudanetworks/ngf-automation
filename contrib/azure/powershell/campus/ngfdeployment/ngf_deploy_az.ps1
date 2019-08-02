@@ -160,12 +160,12 @@ if(!$moduleversion){
 
 Write-Host "Logging into Azure"
 if($xcl8Net){
-    Write-Host "Accelerated Networking enabled, VM deployment size $($vmSize), if this is not compatible deployment wil"
+    Write-Host "Accelerated Networking enabled, VM deployment size $($vmSize), if this is not compatible deployment will fail!"
 
 }
 
 # Authenticate
-#Connect-AzAccount
+Connect-AzAccount
 
 Write-Host 'Starting Deployment - this may take a while'
 if(!(Get-AzResourceGroup -Name $ResourceGroupName -Location $location -ErrorAction SilentlyContinue)){

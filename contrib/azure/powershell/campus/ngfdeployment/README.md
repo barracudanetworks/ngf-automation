@@ -16,11 +16,11 @@ To organize the resources in the cloud, it is recommend to use multiple resource
 * **(optional) Storage resource group** – Contains the storage accounts holding user-defined images and OS disk images for the VMs. This is not needed if managed disks are used.
 * **Load Balancers** - will create Basic ELB for any WAF deployment and defaults to using Standard LB setup for firewalls
 * **Multiple Data Disks** - allows FW's to be deployed with multiple data disks for increased storage and better IOPS performance
-* ** Network Security Groups - creates simple NSG's for the FW or WAF
+* **Network Security Groups** - creates simple NSG's for the FW or WAF
 
 New Az module script ngf_deploy_az.ps1 will also deploy;
-* ** Cluster of CGF's** Including a HA pair with Standard LB's or multiple none clustered nodes behind the Load balancers. 
-* ** Multi-NIC ** - can deploy dual NIC CGF clusters with External and Internal LB
+* **Cluster of CGF's** Including a HA pair with Standard LB's or multiple none clustered nodes behind the Load balancers. 
+* **Multi-NIC ** - can deploy dual NIC CGF clusters with External and Internal LB
 * **Availability Zones ** - can deploy into Availabilty Zones instead of Availabilty Sets
 * **Accelerated Networking ** - can deploy VM's with accelerated networking enabled (version 8.0 releases and above)
 

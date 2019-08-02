@@ -4,10 +4,13 @@
     "\\contrib",
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
-    "\\contrib\\azure\\powershell\\multisubudrupdate",
+    "\\contrib\\azure\\powershell\\campus",
+    "\\contrib\\azure\\powershell\\campus\\cloudintegration",
+    "\\contrib\\azure\\powershell\\campus\\ngfdeployment",
+    "\\contrib\\azure\\powershell\\module",
     "\\contrib\\azure\\powershell\\udrsync",
     "\\contrib\\azure\\python"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\multisubudrupdate\\AzureStack_Workflow.ps1",
+  "SelectedNode": "\\contrib\\azure\\powershell\\campus\\ngfdeployment\\ngf_deploy_az.ps1",
   "PreviewInSolutionExplorer": false
 }

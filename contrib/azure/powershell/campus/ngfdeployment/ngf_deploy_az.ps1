@@ -343,7 +343,7 @@ $diskName = Invoke-Command $diskNamedef
 		    $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId -LoadBalancerBackendAddressPoolId $BackendPool.Id -LoadBalancerInboundNatRuleId $natRule1.Id, $natRule2.Id -NetworkSecurityGroupId $nsg.id
 	    }else{
             
-                      if($quantity -eq 2 -and $vmNum -eq 1){
+            if($quantity -eq 2 -and $vmNum -eq 1){
                 if($xcl8Net){
                     $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId  -EnableAcceleratedNetworking -PrivateIpAddress $cgf1nic1InternalIP -EnableIPForwarding -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $BackendPool.Id
                 
@@ -359,10 +359,10 @@ $diskName = Invoke-Command $diskNamedef
                 }
             }else{
                 if($xcl8Net){
-                    $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId  -EnableAcceleratedNetworking -PrivateIpAddress $cgf1nic1InternalIP -EnableIPForwarding -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $BackendPool.Id
+                    $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId  -EnableAcceleratedNetworking -EnableIPForwarding -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $BackendPool.Id
                 
                 }else{
-                    $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId  -PrivateIpAddress $cgf1nic1InternalIP -EnableIPForwarding -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $BackendPool.Id
+                    $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId   -EnableIPForwarding -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $BackendPool.Id
                 }
             }
 
@@ -385,16 +385,13 @@ $diskName = Invoke-Command $diskNamedef
             }elseif($nicName2){
                             
                 if($xcl8Net){
-                    $nic2 = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName2 -SubnetId $Subnet2Id  -EnableAcceleratedNetworking -PrivateIpAddress $cgf1nic2InternalIP -EnableIPForwarding -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $intBackendPool.Id
+                    $nic2 = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName2 -SubnetId $Subnet2Id  -EnableAcceleratedNetworking  -EnableIPForwarding -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $intBackendPool.Id
                 
                 }else{
-                    $nic2 = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName2 -SubnetId $Subnet2Id  -PrivateIpAddress $cgf1nic2InternalIP -EnableIPForwarding -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $intBackendPool.Id
+                    $nic2 = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName2 -SubnetId $Subnet2Id   -EnableIPForwarding -NetworkSecurityGroupId $nsg.id -LoadBalancerBackendAddressPoolId $intBackendPool.Id
                 }
 
             }
-
-        }
-
 
         }
     

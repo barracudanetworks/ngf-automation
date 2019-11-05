@@ -9,3 +9,6 @@
 /.psproj
 *.pssproj
 /.vs/ngf-automation/v16
+/contrib/azure/powershell/BarracudaCGF
+/contrib/azure/powershell/campus/ngfdeployment/test
+/.vs/tasks.vs.json

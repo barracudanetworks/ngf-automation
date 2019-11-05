@@ -5,12 +5,11 @@
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
     "\\contrib\\azure\\powershell\\campus",
-    "\\contrib\\azure\\powershell\\campus\\cloudintegration",
-    "\\contrib\\azure\\powershell\\campus\\ngfdeployment",
-    "\\contrib\\azure\\powershell\\module",
-    "\\contrib\\azure\\powershell\\udrsync",
-    "\\contrib\\azure\\python"
+    "\\contrib\\azure\\powershell\\multisubudrupdate",
+    "\\contrib\\azure\\python",
+    "\\contrib\\azure\\python\\multi_ip_object_rewrites",
+    "\\contrib\\azure\\python\\zscaler_vpn_failover"
   ],
-  "SelectedNode": "\\contrib\\azure\\powershell\\campus\\ngfdeployment\\ngf_deploy_az.ps1",
+  "SelectedNode": "\\contrib\\azure\\python\\multi_ip_object_rewrites\\multiip_object_rewrite.py",
   "PreviewInSolutionExplorer": false
 }

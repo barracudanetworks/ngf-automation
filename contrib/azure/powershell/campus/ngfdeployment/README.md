@@ -33,17 +33,17 @@ Check the PowerShell versions with the following commands:
 ```
 Get-InstalledModule -Name AzureRM,Az
 ```
-## Step-by-Step Instructions on Barracuda Campus
+# Step-by-Step Instructions on Barracuda Campus
 Fill in the variables at the top of the script to match your setup. For more in depth instructions follow the instructions on Barracuda Campus.
 For more information, see [Barracuda Campus](https://campus.barracuda.com/product/CloudGenfirewallf/doc/53248363/how-to-deploy-an-f-series-firewall-in-microsoft-azure-using-powershell-and-arm/).
 
-## New Az Module script differences
+# New Az Module script differences
 This script contains the parameters but can be called via another powershell script and treated like a function if desired. New parameters introduced by this script are;
 #Parameters
 This script contains a number of default values which help simplify the options available below you will see the parameters explained. To deploy a standard HA cluster using the lastest abilities you just need to provide the compulsory parameters
 Everything else is optional and you can use to customise to suit your deployment requirement. 
 
-###Compulsory
+### Compulsory
 $location - define the location in which you are building
 $rootPassword - provide a password string
 $vmPrefix - provide a name for the VM a number will be appended, eg. MYNAME-1
@@ -54,25 +54,25 @@ $vmLicenseType - either byol or hourly
 $vmProductType - a choice of barracuda-ng-firewall, waf, barracuda-cc
 
 
-###Quantity
+### Quantity
 $quantity - defaults to 2 for a HA setup, but can be 1 or greater as required. Beyond 2 and the Firewalls are not clustered and require another method to manage their configs such a CC or RESTAPI
 
-###High Availbilty controls from Azure
+### High Availbilty controls from Azure
 $vmAvZone - this defaults to true and unless you provide an AVSET name will be used. 
 $vmAvSetName - provide this value and it will be used
 $PlatformFaultDomainCount - use this numeric value to determine the AV set fault domain
 $PlatformUpdateDomainCount - use this numeric value to determine the AV set fault domain
 
-###Performance and Load Balancer features
+### Performance and Load Balancer features
 $acceleratedNetworking - defaults to true but will disable on 1 core units
 $lbSku - defaults to standard for Firewall deployments
 
-###Non-Managed disk deployments must provide the following values.
+### Non-Managed disk deployments must provide the following values.
 $storageAccountName - name of the storage account
 $storageAccountContainerName - container name to use within that storage account
 $storageAccountResourceGroupName - resource group the storage account belongs too. 
 
-###Custom Versions or Images
+### Custom Versions or Images
 To deploy using custom images or a specific version use the following parameters - if you need to customise the existing values you can lookup versions using
 Get-AzVMImage -Location $location -PublisherName "barracudanetworks" -Offer $vmProductType -Skus $vmLicenseType
 
@@ -81,12 +81,12 @@ $wafVersion - defaults to latest but use the options to select an alternative
 $customSourceImageUri - provide a https path to a suitable vhd to build from
 $customImage - provide the name of a custom image you have created
 
-###Additional Disks for High IOPS
+### Additional Disks for High IOPS
 Use when high logging requirements expected or WANOpt is used. Add multiple data disks to increase IOPS
 $datadisksize - provide the size in GB of the data disk, eg. 256 
 $datadiskqty - provide the number of data disks to be stripped together for max IOPS
 
-###Multiple NIC deployments
+### Multiple NIC deployments
 $SubnetNameNic2 - provide the name of a second subnet if you wish to deploy using 2 NICs
 Custom IP deployments - the script will by default allocate the first available IP's in the provided subnets to itself and the Internal LB for Active/Passive deployments this script
 will allow you to manually define the IP's if you wish. Do NOT use these with deployments beyond 2 hosts 
@@ -97,11 +97,11 @@ $ilb2Ip - sets the private IP for the second subnets internal LB
 $cgf1nic2InternalIP - sets the private IP for the first firewalls second NIC
 $cgf2nic2InternalIP - sets the private IP for the second firewalls second NIC
 
-###Misc
+### Misc
 $enableREST - defaults to true and enables the REST API
 $storageType - defaults to Premium_LRS but can be adjusted as desired.
 
-###Control Center Integration
+### Control Center Integration
 To have the deployment collect the config from Control Center 
 $ccSecret - secret key used by CC to authorise this request
 $ccIP - public or private IP of the CC reachable by this deployment

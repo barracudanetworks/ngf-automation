@@ -2,6 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+/.vs/*
 /.vs/ngf-automation/v15
 /.vs/slnx.sqlite
 /contrib/azure/python/multiip_fwrule_rewrite (2).py

@@ -69,9 +69,21 @@ The above parameter is essential the below parameters are optional unless you ar
 
 `
 -s or --source = the URL to collect the information for. Defaults to the Azure or O365 publishing URL
- -i or --insecure - add this only if you wish to bypass SSL when downloading the source url
+`
+
+`
+-i or --insecure - add this only if you wish to bypass SSL when downloading the source url
+`
+
+`
 -a  or --api - when the scripts update via API they will use the local connection, only change this if essential, provide format IPorFQDN:port
+`
+
+`
 -x or --virtualserver - provide if your firewall has a non standard virtual server. Defaults to S1, for v8 provide this as -x CSC
+`
+
+`
 -f or --firewallname - provide the name of the firewall service if changed from standard NGFW
 `
 

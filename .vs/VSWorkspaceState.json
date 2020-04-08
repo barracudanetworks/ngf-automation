@@ -4,12 +4,14 @@
     "\\contrib",
     "\\contrib\\azure",
     "\\contrib\\azure\\powershell",
-    "\\contrib\\azure\\powershell\\campus",
     "\\contrib\\azure\\powershell\\multisubudrupdate",
     "\\contrib\\azure\\python",
+    "\\contrib\\azure\\python\\creating_network_objects",
+    "\\contrib\\azure\\python\\dynamic_vpn_rule_failover",
     "\\contrib\\azure\\python\\multi_ip_object_rewrites",
-    "\\contrib\\azure\\python\\zscaler_vpn_failover"
+    "\\contrib\\general",
+    "\\contrib\\general\\ngf-backup"
   ],
-  "SelectedNode": "\\contrib\\azure\\python\\multi_ip_object_rewrites\\multiip_object_rewrite.py",
+  "SelectedNode": "\\contrib\\azure\\python\\creating_network_objects\\import_azure_ips.py",
   "PreviewInSolutionExplorer": false
 }

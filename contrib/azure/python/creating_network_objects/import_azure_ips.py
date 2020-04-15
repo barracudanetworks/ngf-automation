@@ -90,8 +90,7 @@ class AzureIPFetcher(object):
             for entry in parsed_json['values']:
                 try:
                     if entry['properties']['addressPrefixes']:
-                        netobj_name = entry['name']
-                        netobj_region = entry['properties']['region']
+                        netobj_name = entry['properties']['region']
                         self.netobjects.setdefault(netobj_name, set([]))
                         logger.debug("processing: %s"%netobj_name)
                         for iprange in entry['properties']['addressPrefixes']:
@@ -110,10 +109,16 @@ class AzureIPFetcher(object):
     def export_api(self, token, server, service):
         logger.debug("Entering API update process")
         endpoint = self.endpoint+server+"/services/"+service+"/objects/networks/"
+        #creates a network object containing all Azure ranges.
         jsonrefdict = { "name": "AllAzureIPs", "comment": "added by azure script", "type":"generic", "overrrideSharedObject":'false', "excluded":[], "included": []}
+        
+        #creates network objects for each region defined and all the ranges recorded under that region
         for region, ranges in self.netobjects.iteritems():
             jsondict = { "name": region, "comment": "added by azure script", "type":"generic", "overrrideSharedObject":'false', "excluded":[], "included": []}
-            jsonrefdict["included"].append({"reference":region,"type":"reference"})
+            
+            if region:
+                jsonrefdict["included"].append({"reference":region,"type":"reference"})
+            
             for range in ranges:
                 jsondict["included"].append({"ipV4":range,"type":"ipV4"})
             postdata = json.dumps(jsondict)
@@ -123,10 +128,10 @@ class AzureIPFetcher(object):
             else:
                 post = self.post_url(url=endpoint+region, data=postdata, token=token, method="PUT")
                 logger.info("Updating record for" + region)
-            time.sleep(10)
          
-        #creats a full Azure reference object based upon 
+       #performs the post for the full Azure IP ranges object references
         postdata = json.dumps(jsonrefdict)
+        logger.debug(postdata)
         if(self.request_url(endpoint+"AllAzureIPs",token=token) == "HTTPError: 404"):
                 post = self.post_url(url=endpoint, data=postdata, token=token, method="POST")
                 logger.info("Creating record for all of Azure")
@@ -157,6 +162,7 @@ def main():
     parser.add_option("-a", "--api", default="localhost:8080", help="API fqdn or IP if not localhost")
     parser.add_option("-x", "--virtualserver", default="S1", help="name of virtual server if not standard")
     parser.add_option("-f", "--firewallname", default="NGFW", help="name of firewall service if not standard")
+  #  parser.add_option("-r", "--", default="7", help="release software of firewall")
 
     # parse args
     (options, args) = parser.parse_args()
@@ -171,12 +177,14 @@ def main():
     else:
         parser.error("invalid verbosity selected. please check --help")
 
+    #performs the download
     try:
         aip = AzureIPFetcher(url=options.source, ssl_verify=not options.insecure, api=options.api)
         aip.download()
     except:
         logger.warn("Unable to collect Azure IPs")
     
+    #performs the local API calls to update the ruleset
     try:
         aip.export_api(token=options.token, server=options.virtualserver, service=options.firewallname)
     except:

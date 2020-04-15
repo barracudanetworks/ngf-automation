@@ -76,7 +76,27 @@ class AzureIPFetcher(object):
                         #print entry['id']
                 except KeyError:
                     print "No URLS"
-            
+
+
+    def post_url(self, url, data, token, method):
+        logger.debug("post: %s"%url)
+        if requests:
+            return requests.post(url=url, data=data, headers={'X-API-Token': token, 'Content-Type': 'application/json'}).content
+        
+        if(method=="PUT"):
+            request = urllib2.Request(url, headers={'X-API-Token': token, 'Content-Type': 'application/json'}, data=data)
+            request.get_method = lambda: 'PUT'
+        else:
+            request = urllib2.Request(url, headers={'X-API-Token': token, 'Content-Type': 'application/json'}, data=data)
+
+        try:
+            results = urllib2.urlopen(request).read()
+        except urllib2.HTTPError as e:
+            logger.warn(' POST or PUT HTTPError: {}'.format(e.code))
+            return ('HTTPError: {}'.format(e.code))
+        else:
+            return results
+        
       
     def export(self, to=""):
         print self.products

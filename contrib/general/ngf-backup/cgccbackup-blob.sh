@@ -6,7 +6,7 @@
 # | |_) | (_| | |  | | | (_| | (__| |_| | (_| | (_| |
 # |____/ \__,_|_|  |_|  \__,_|\___|\__,_|\__,_|\__,_|
 #                                                    
-# Backup script for the Barracuda NextGen Control Center.
+# Backup script for the Barracuda CloudGen Control Center.
 # The backup destination is an Azure Blob Storage Container.
 #
 # AUTHOR: Gemma Allen (gallen@barracuda.com)
@@ -33,41 +33,43 @@ case $i in
 esac
 done
 
+# Local logging adapt the LOGDIR variable to the directory where script is installed.
+TODAY=`date +"%Y-%m-%d"`
+LOGDIR="/root/backup"
+LOG="$LOGDIR/backup-$TODAY.log"
+
 #authenticates to the CLI uisng the system identity
 #Get VM name
 VM=$(curl -sH Metadata:true "http://169.254.169.254/metadata/instance/compute/name?api-version=2017-08-01&format=text")
 az login --identity >> $LOG 2>&1
 #SPID=$(az resource list -n $vm --query [*].identity.principalId --out tsv)
 
-# Local logging adapt the LOGDIR variable to the directory where script is installed.
-TODAY=`date +"%Y-%m-%d"`
-LOGDIR="/root/backup"
-LOG="$LOGDIR/backup-$TODAY.log"
+
 
 # Email Notification
 SMTPNOTIFICATION=true
 SMTPSERVER="[EMAIL-SERVER]"
 FROM="[EMAIL-FROM]"
 TO="[EMAIL-TO]"
-SUBJECT="Backup NextGen Firewall F-Series - $TODAY"
+SUBJECT="Backup CloudGen Firewall F-Series - $TODAY"
 
 # Backup filename
-FILENAME=CC-tree_`date +%Y_%m_%d_%H_%M`.par
-FILENAMEGZ="$VM-$FILENAME.gz"
-FILENAME2=CC-box_`date +%Y_%m_%d_%H_%M`.par
-FILENAMEGZ2="$VM-$FILENAME2.gz"
+FILENAME=$VM-CC-tree_`date +%Y_%m_%d_%H_%M`.par
+FILENAMEGZ="$FILENAME.gz"
+FILENAME2=$VM-CC-box_`date +%Y_%m_%d_%H_%M`.par
+FILENAMEGZ2="$FILENAME2.gz"
 
 # Creating the log directory
 if [ ! -d "$LOGDIR" ];
 then
   echo
-  echo "Creating local log directory ($LOG) on Barracuda NextGen Firewall F-Series ..."
+  echo "Creating local log directory ($LOG) on Barracuda CloudGen Firewall F-Series ..."
   mkdir -p $LOGDIR
 fi
 
 {
   echo "-------------------------------------------------------------------------" 
-  echo " Backup script for Barracuda NextGen Control Center" 
+  echo " Backup script for Barracuda CloudGen Control Center" 
   echo " Date: $TODAY"
   echo
   echo "-------------------------------------------------------------------------" 
@@ -90,9 +92,9 @@ fi
   echo " Transfer to Azure Storage Account $AZURE_STORAGE_ACCOUNT in blob $BLOB_CONTAINER" 
   echo
 
-  az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAMEGZ" --name $FILENAMEGZ
+  az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAMEGZ" --name  $FILENAME2
 
-  az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAME2GZ" --name $FILENAME2GZ
+  az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAMEGZ2" --name $FILENAME2
   echo
   echo "-------------------------------------------------------------------------"
   echo " Clean up" 

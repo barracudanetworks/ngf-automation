@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/spaceapegames/terraform-provider-example/api/client"
-	"client\barracudacgf"
+	"client"
 )
 
 func Provider() terraform.ResourceProvider {

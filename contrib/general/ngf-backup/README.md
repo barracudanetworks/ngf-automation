@@ -5,7 +5,7 @@ The scripts in this project will backup the configuration of the Barracuda Cloud
 
 There are 3 available scripts. 
 <ol>
-<li> Those ending in blob - which are for version 8 and above</li>
+<li> Those ending in cloud - which are for version 8 and above</li>
 <li> Those ending in v7blob - which are for version 7 and below </li>
 <li> Those with no special ending which upload to FTP</li>
 </ol>
@@ -15,8 +15,9 @@ There are 3 available scripts.
     <li>It is presumed your Firewalls were built using managed system identifies or a user assigned identity, if not you can configure these following the instructions [here](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/qs-configure-portal-windows-vm) </li>
     <li>Copy the script to the firewall into <code>cd /customscript/<filename></code></li>
     <li>Verify and make sure the script is executable: <code># chmod 755 ngfbackup-as.sh</code></li>
-    <li>In the Azure portal go to the storage account created to receives these backups, go into IAM and assign the Contributor role to the Virtual Machine roles for the Firewalls ![Assign Role ](images/assignrole.png)</li>
-    <li>Trigger the script providing the name of the storageaccount and container for example <code> ./customscript/cgfbackup-blob.sh -s=storageaccountname -c=containername </code></li>
+    <li>If you are using Azure, in the Azure portal go to the storage account created to receives these backups, go into IAM and assign the Contributor role to the Virtual Machine roles for the Firewalls ![Assign Role ](images/assignrole.png)</li>
+    <li>If you are in AWS, in the AWS portal assign the instances sufficient permissions to write to the S3 storage account 
+    <li>Trigger the script providing the name of the storageaccount and container for example <code> ./customscript/cgfbackup-cloud.sh -s=storageaccountname -c=containername </code> or for AWS <code> ./customscript/cgfbackup-cloud.sh -b='s3name/bucketname' </code> </li>
     <li>If need you can configure the script to email out, please edit the SMTP varibles directly in the script to do this.</li>
     <li>Schedule the script to run every day or week using the cronjob functionality in the system. More info can be found <a href="https://campus.barracuda.com/product/CloudGenfirewallf/article/NGF71/ConfigCronjobs/">here</a></li>
 </ol>

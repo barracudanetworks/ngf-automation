@@ -1,3 +1,5 @@
+#This script allows you to bulk import information from CudaLaunch.csv to Native Apps.
+#This script works with Barracuda CloudGen Firewall v 8.0.
 #Delete "CGFW_SSLVPN_NativeApp_Settings.txt"
 If ((Test-Path -Path "CGFW_SSLVPN_NativeApp_Settings.txt") -eq $True) {
     Rename-Item -Path "CGFW_SSLVPN_NativeApp_Settings.txt" -NewName "CGFW_SSLVPN_NativeApp_Settings_$(Get-Date -Format ddMMyyyy_HHMMss).txt"

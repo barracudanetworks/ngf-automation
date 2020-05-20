@@ -9,6 +9,7 @@ It can be ran online of offline (via the provision of CSV files), when online yo
 
 ```powershell
 
+#Assuming you use self signed certs then leave this in place, as it makes some exceptions to Powershells default handling.
 Set-BarracudaCGFtoIgnoreSelfSignedCerts -allowSelfSigned -noCRL
 
 #Create a rule list to import this into - define the name

@@ -1,4 +1,4 @@
-Function Get-BarracudaCGFStatus{
+Function Get-BarracudaCCRanges{
 <#
 .Synopsis
     Gets the status of the CGF
@@ -18,7 +18,7 @@ param(
 [string]$deviceName,
 [Parameter(Mandatory=$false,
     ValueFromPipelineByPropertyName=$true)]
-[string] $devicePort="8443",
+[int] $devicePort=8443,
 [Parameter(Mandatory=$true,
     ValueFromPipelineByPropertyName=$true)]
 [string] $token,
@@ -35,8 +35,10 @@ param(
     #Sets the token header
     $header = @{"X-API-Token" = "$token"}
 
-	try{
-		$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box" -Method GET -Headers $header -UseBasicParsing 
+    try{
+
+           	$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/ranges" -Method GET -Headers $header -UseBasicParsing
+       
 	}catch [System.Net.WebException] {
                 $Error[0] | Get-ExceptionResponse
                 throw   

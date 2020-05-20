@@ -9,112 +9,109 @@
 	New-BarracudaNGFNetworkObject -deviceName <hostname or ip> -devicePort 8443 -creds <powershell credentials> -Type generic -name <objectname> -included @(@{"entry"=@{ip="$($i)"}},@{"entry"=@{ip="$($i)"}},@{"entry"=@{ip="$($i)"}}) 
     $object = New-BarracudaCGFNetworkObject -name myObject -type generic -includedObjects $include_objects -excludedReferences "Internet" -geo $geos 
 .Notes
-v0.1
+v0.2
 #>
 
 Function New-BarracudaCGFNetworkObject {
     [cmdletbinding()]
 #If none of these are supplied it returns the code
 
-param(
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$deviceName,
+    param(
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$deviceName,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$false)]
-[string] $token,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [string] $token,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string] $devicePort=8443,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string] $devicePort=8443,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$virtualServer,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$virtualServer,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$serviceName,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$serviceName,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$name,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$name,
 
-[Parameter(Mandatory=$true,
-ValueFromPipelineByPropertyName=$true)]
-[ValidateSet("generic","singleIPv4Address","listIPv4Address","singleIPv4Network","listIPv4Network","hostname","singleIPv6Address","listIPv6Address","singleIPv6Network","listIPv6Network")] 
-[string]$type="generic",
+        [Parameter(Mandatory=$true,
+        ValueFromPipelineByPropertyName=$true)]
+        [ValidateSet("generic","singleIPv4Address","listIPv4Address","singleIPv4Network","listIPv4Network","hostname","singleIPv6Address","listIPv6Address","singleIPv6Network","listIPv6Network")] 
+        [string]$type="generic",
 
-# Below are the values
+        # Below are the values
 
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[array]$includedObjects=@(),
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [array]$includedObjects=@(),
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[array]$includedReferences=@(),
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [array]$includedReferences=@(),
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[array]$excludedObjects,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [array]$excludedObjects,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[array]$excludedReferences,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [array]$excludedReferences,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$color,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$color,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$false)]
-[int]$dnsLifetime=600,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [int]$dnsLifetime=600,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$false)]
-[hashtable] $geo,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [hashtable] $geo,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$comment,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$comment,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$range,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$range,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$cluster,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$cluster,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$box,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$box,
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$false)]
-[switch]$notHTTPs,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [switch]$notHTTPs,
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [switch]$ccglobal
+        <#
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [switch]$hostfirewall
+        #>
+    )
 
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$false)]
-[switch]$hostfirewall
-
-)
-
-    #makes the connection HTTPS
-    if(!$notHTTPS){
-        $s = "s"
-    }
-
-    #Sets the token header
-    $header = @{"X-API-Token" = "$token"}
-
+    
 
 #defines the URL to call
-    if($cc){
-        $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
+ <#   if($cc){
+   
+     $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
         
         if($range -and $cluster -and $serverName -and $serviceName){
             $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/servers/$($PSBoundParameters.("serverName"))/services/$($PSBoundParameters.("serviceName"))"
@@ -136,9 +133,11 @@ ValueFromPipelineByPropertyName=$false)]
         }else{
             $url = $url + "/firewall/objects/networks"
         }
+
+        
     }else{
         $url = "http$($s)://$($deviceName):$($devicePort)/rest/config/v1"
-        if($hostfirewall){
+  <#      if($hostfirewall){
             $url = $url + "/box/firewall/objects/networks"
         }else{
             if($serviceName -and $virtualServer){
@@ -149,41 +148,33 @@ ValueFromPipelineByPropertyName=$false)]
             }
           #  $url = $url + "/forwarding-firewall/objects/networks"
         }
-    }
 
+        
+    }#>
+    If ($PSBoundParameters['Debug']) {
+        $DebugPreference = 'Continue'
+    }
     if($range -and !$cluster){
         Write-Error "Partial Control Center information supplied, please change range, cluster and box info"
     }
 
-    if($PSBoundParameters.ContainsKey("Debug")){
-    #Note - the function will return any values in the pipeline, so always use Write-Host 
-        Write-Debug $PSBoundParameters
-    }
+    Write-Debug "Provide PSBoundParameters"
 
    #sets any default variables to parameters in $PSBoundParameters
     foreach($key in $MyInvocation.MyCommand.Parameters.Keys)
     {
         $value = Get-Variable $key -ValueOnly -EA SilentlyContinue
         if($value -and !$PSBoundParameters.ContainsKey($key)) {$PSBoundParameters[$key] = $value}
+        Write-Debug "$($key) : $($value)"
     }
     
     #Void's anything we don't want
-    [Void]$PSBoundParameters.Remove("token")
+   # [Void]$PSBoundParameters.Remove("token")
     
+    #Provides empty array if nothing provide.
     if(!$PSBoundParameters.ContainsKey("excluded")){
         $PSBoundParameters.Add("excluded",@())
     }
-    
-    $postParams = @{}
-    if($PSBoundParameters.name){
-    $postParams.Add("name",$name)
-    }
-    $postParams.Add("type",$type)
-    if($PSBoundParameters.geo){
-        $postParams.Add("geo",$PSBoundParameters.geo)
-    }
-    $postParams.Add("comments",$comments)
-
     if(!$includedObjects){
         $includedObjects = @()
         #$includedObjects = $includedObjects + @{entry=$includedObj}
@@ -194,7 +185,18 @@ ValueFromPipelineByPropertyName=$false)]
         $excludedObjects = @()
         #$excludedObjects = $excludedObjects + @{entry=$excludedObj}
     }
+    
 
+    #builds the paramters to be posted
+    $postParams = @{}
+    if($PSBoundParameters.name){
+    $postParams.Add("name",$name)
+    }
+    $postParams.Add("type",$type)
+    if($PSBoundParameters.geo){
+        $postParams.Add("geo",$PSBoundParameters.geo)
+    }
+    $postParams.Add("comments",$comments)
 
 
     #references need to be hashtables inside array
@@ -210,37 +212,37 @@ ValueFromPipelineByPropertyName=$false)]
     $postParams.Add("excluded",$excludedObjects)
     $postParams.Add("included",$includedObjects)
     
+    #Converts to JSON
     $data = ConvertTo-Json $postParams -Depth 99
     
     
+    #Sets the token header
+    $header = @{"X-API-Token" = "$token"}
+
+    #Inserts the tail of the API path to the parameters 
+    $PSBoundParameters["context"] = "objects/networks"
+
+    #builds the REST API path.
+    $url = Set-RESTPath @PSBoundParameters
+
+    Write-Debug $url
+    Write-Debug $data
+
     if(!$deviceName -and !$token){
         return $postParams
 
     }else{
-      
-        if($PSBoundParameters.ContainsKey("Debug")){
-            Write-Verbose $postParams
-            Write-Verbose $url
-            Write-Verbose $data
 
-            try{
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing -Debug
-            }catch [System.Net.WebException] {
-                    $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
-                    Write-Error $results
-                    throw   
-                }
-        }else{
         
             try{
                 $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing
             }catch [System.Net.WebException] {
                     $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                     Write-Error $results
-                    throw   
-                }
+                     
+            }
 
-        }
+
     }
 
 return $results

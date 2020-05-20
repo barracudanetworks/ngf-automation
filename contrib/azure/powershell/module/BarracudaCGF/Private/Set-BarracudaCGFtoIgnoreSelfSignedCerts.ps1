@@ -1,4 +1,5 @@
-Function Set-CertSecurity{
+Function Set-BarracudaCGFtoIgnoreSelfSignedCerts{
+[cmdletbinding()]
 param(
 [switch]$allowSelfSigned,
 [switch]$noCRL

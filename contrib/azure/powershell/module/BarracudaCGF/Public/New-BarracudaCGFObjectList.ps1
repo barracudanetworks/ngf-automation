@@ -1,6 +1,6 @@
 <#
 .Synopsis
-	Takes input in the form of a CSV, list or single IP and converts into an array suitable for use with New-BarracudaNGFNetworkObject command
+	Takes input in the form of a CSV, list or single IP and converts into an array suitable for use with New-BarracudaNGFNetworkObject
 .Description
     This function can be used to create a suitable array to be used with the New-BarracudaNGFNetworkObject command as either the included or excluded IP's 
 	for the network object creation. 
@@ -11,36 +11,39 @@
 	type, addresses
 	ipV4, 10.7.3.0/24
 	ipV4, 10.7.4.0/24
-	Or a simple list seperated by , or a powershell Array ''
+	Or a simple list seperated by , or a powershell Array''
 .Example
 	New-BarracudaNGFObject -objectType ipV4 -objectValue 10.2.1.3
 	New-BarracudaNGFObject -objectType ipV4 -csvFileName C:\myfile.csv
-    Convert
+
 
 .Notes
 	Handles IPv4 and IPv6
-	added -old which should be enabled if the subnet masks do not appear correctly in the FW. Older API releases did not convert to a reverse mask. v7.2 and up do not need this. 
+	added -v7 which should be enabled if the subnet masks do not appear correctly in the FW. Older API releases did not convert to a reverse mask. 
+	v7.2 - v8.0 do not need this and should use -v8
+    added -v8 to handle the earlier formatting, v8.0.1 onwards which is the default doesn't use the objectType parameter at all and needs no extra
 #>
-Function Convert-BarracudaCGFNetworkObject{
-    [cmdletbinding()]
+Function New-BarracudaCGFObjectList{
+ [cmdletbinding()]
+
 param(
 [Parameter(Mandatory=$false,ValueFromPipeline=$false)]
-[ValidateSet("ipV4", "rangeV4", "networkV4", "ipV6", "reference","mac")]  
+[ValidateSet("ipV4", "rangeV4", "networkV4", "ipV6", "reference")]  
 [string]$objectType,
 [Parameter(Mandatory=$false,ValueFromPipeline=$false)]
 [string]$objectValue,
 [Parameter(Mandatory=$false,ValueFromPipeline=$false)]
 $csvFileName,
 [Parameter(Mandatory=$false,ValueFromPipeline=$false)]
-[array]$objectList,
-[Parameter(Mandatory=$false,ValueFromPipeline=$false)]
-[string]$comment,
-[switch]$old
+$objectList,
+[switch]$reference,
+[switch]$v7,
+[switch]$v8
 )
 
 
     $array=@()
-	if($old){
+	if($v7){
 		switch($objectType){
 			"ipV4" {
 				if($csvFile){
@@ -70,37 +73,32 @@ $csvFileName,
 			}
 			default{}
 		}
-	}else{
+	}elseif($v8){
 		switch($objectType){
 			"ipV4" {
-				if(!$objectList){
-                    $array = @{entry=@{ip="$($objectvalue)";comment="$($comment)"}}
-                }else{
-                    ForEach($i in $objectList){
-						    #$array = $array += @{entry=@{type="ipV4";ip="$($i)";comment="$($comment)"}}
-                            $array = $array += @{entry=@{ip="$($i)";comment="$($comment)"}}
-				    }
-                }
+				ForEach($i in $objectList){
+						$array = $array += @{type="ipV4";ipV4="$($i)"}
+				}
 			}
 			"ipV6" {
 				ForEach($i in $objectList){
-						#$array = $array += @{entry=@{type="ipV6";ip="$($i)";comment="$($comment)"}}
-                        $array = $array += @{entry=@{ip="$($i)";comment="$($comment)"}}
+						$array = $array += @{type="ipV6";ipV6="$($i)"}
 				}
-			}
-			"mac" {
-				ForEach($i in $objectList){
-						#$array = $array += @{entry=@{type="mac";mac="$($i)";comment="$($comment)"}}
-                $array = $array += @{entry=@{mac="$($i)";comment="$($comment)"}}
-				}
+                
 			}
 		}
-	}
+	}else{
+        if($reference){
+            
+            ForEach($i in $objectList){
+		        $array = $array += @{"references"="$($i)"}
+		    }
+        }else{
+            ForEach($i in $objectList){
+		        $array = $array += @{"entry"=@{ip="$($i)"}}
+		    }
+        }
+    }
 
 return $array
 }
-
-
-
-
-

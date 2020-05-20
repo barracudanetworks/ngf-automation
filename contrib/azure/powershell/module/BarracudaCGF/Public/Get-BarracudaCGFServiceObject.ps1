@@ -1,26 +1,51 @@
 <#
 .Synopsis
-	Creates a new service object in the firewall or returns a suitable powershell object for use with New-BarracudaCGFFirewallRule to create an explicit object
+	Gets all or a single service object
 .Description
     This function will create a new service object in either the Host Firewall or Forwarding Firewall or return a powershell object. It expects input of either the -entries or -references to create an object.
     -entries is hashtable that you can use Convert-BarracudaCGFServiceObject-ps1 to create from CSV.
 
 .Example
-	New-BarracudaCGFServiceObject -deviceName $dev_name -token $token -name "MyObject" -entries $array -Debug -Verbose 
-    $object = New-BarracudaCGFServiceObject -name "MyObject" -entries $array 
+    ##CC cluster objects - ccglobal objects
+    Get-BarracudaCGFServiceObject -deviceName $barracudacc -token $barracudacctoken -ccglobal
+
+    ##CC cluster objects
+    Get-BarracudaCGFServiceObject -deviceName $barracudacc -token $barracudacctoken -range 1 
+
+    ##CC cluster objects
+    Get-BarracudaCGFServiceObject -deviceName $barracudacc -token $barracudacctoken -range 1 -cluster "EUS2"
+
+
+    #CC host fw box in cluster
+    Get-BarracudaCGFServiceObject -deviceName $barracudacc -token $barracudacctoken -range 1 -cluster "EUS2" -box "GA-EUS2-CGF1"
+
+    #CC forward fw box in cluster with details to get the port numbers etc
+    $eus2 = Get-BarracudaCGFServiceObject -deviceName $barracudacc -token $barracudacctoken -range 1 -cluster "EUS2" -box "GA-EUS2-CGF1" -serviceName "NGFW" -details
+
+    #Single FW Host
+    Get-BarracudaCGFServiceObject -deviceName $barracudafw -token $fwtoken 
+
+    #Singe FW forwarding object
+    Get-BarracudaCGFServiceObject -deviceName $barracudafw -token $fwtoken -fwdingfw
+
+    #Single FW Forwarding v8
+    Get-BarracudaCGFServiceObject -deviceName $barracudafw -token $fwtoken -serviceName "NGFW"
+
+    #Singel FW forwarding V7
+    Get-BarracudaCGFServiceObject -deviceName $barracudafw -token $fwtoken -serviceName "NGFW" -virtualServer "CSC"
 .Notes
 v0.1
 #>
 
-Function New-BarracudaCGFServiceObject {
+Function Get-BarracudaCGFServiceObject {
 [cmdletbinding()]
 param(
 #if no device details are provided a powershell object is created.
-[Parameter(Mandatory=$true,
+[Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
 [string]$deviceName,
 
-[Parameter(Mandatory=$true,
+[Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
 [string] $token,
 
@@ -48,46 +73,31 @@ ValueFromPipelineByPropertyName=$true)]
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
 [string]$box,
-
+[Parameter(Mandatory=$false,ValueFromPipeline=$false)]
+[ValidateSet("special", "local")] 
+[string]$sharedfirewall,
+#triggers 
+[Parameter(Mandatory=$false,
+ValueFromPipelineByPropertyName=$true)]
+[string]$objectName,
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
 [switch]$notHTTPs,
-
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
-[switch]$hostfirewall,
-
+[switch]$details,
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
 [switch]$ccglobal,
-
-# Below are the values that define the object
-
-[Parameter(Mandatory=$true,
-ValueFromPipelineByPropertyName=$true)]
-[string]$name,
-
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[array]$entries=@(),
-
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
-[array] $references,
-
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$comment,
-
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$true)]
-[string]$color
-
+[switch]$fwdingfw
 )
 
     <#
 
-        if($range -or $cluster -or $ccglobal){
+#defines the URL to call
+    if($range -or $cluster -or $ccglobal){
         #REST Path for CC
         $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
         
@@ -142,6 +152,7 @@ ValueFromPipelineByPropertyName=$true)]
         }
     }
     #>
+
     If ($PSBoundParameters['Debug']) {
         $DebugPreference = 'Continue'
     }
@@ -156,22 +167,7 @@ ValueFromPipelineByPropertyName=$true)]
         Write-Debug "$($key) : $($value)"
     }
 
-    
-    $postParams = @{}
-    $postParams.Add("name",$name)
-    $postParams.Add("comments",$comments)
-
-
-        #references need to be hashtables inside array
-        ForEach($obj in $references){
-            $entries = $entries += @{"references"=$obj}
-        }
-    
-    $postParams.Add("entries",$entries)
-    
-    $data = ConvertTo-Json $postParams -Depth 99
-    
-    #Sets the token header
+        #Sets the token header
     $header = @{"X-API-Token" = "$token"}
 
     #Inserts the tail of the API path to the parameters 
@@ -180,23 +176,44 @@ ValueFromPipelineByPropertyName=$true)]
     #builds the REST API path.
     $url = Set-RESTPath @PSBoundParameters
 
-    #Write-Debug $postParams
-    Write-Debug $url
-    Write-Debug $data
+    #Provide a specific object
+    if($objectName){
+        $url = $url + "/$($PSBoundParameters.("objectName"))"
+    }
+    
+    #Provide additional details of objects
+    if($details){
 
+        $url = $url + "?expand=true"
+    }
+    
+    
+   # if($range -and !$cluster){
+   #     Write-Error "Partial Control Center information supplied, please change range, cluster and box info"
+   # }
+
+  
+    
     if(!$deviceName -and !$token){
-        return $postParams
+        Write-Error "No device or token provided!"
 
     }else{
-        
+        Write-Debug $url
+               
             try{
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing
+                if((ConvertFrom-Json $results.Content).objects){
+		            return (ConvertFrom-Json $results.Content).objects
+                }else{
+                    return ConvertFrom-Json $results.Content
+                }
             }catch [System.Net.WebException] {
                     $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                     Write-Error $results
-                   
-                }
+                    throw   
+            }
 
+       
     }
 
 return $results

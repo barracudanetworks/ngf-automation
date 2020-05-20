@@ -61,31 +61,36 @@ ValueFromPipelineByPropertyName=$false)]
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
-[bool]$expand=$false,
+[switch]$details,
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
-[string]$list
+[string]$listname,
+
+[Parameter(Mandatory=$false,
+ValueFromPipelineByPropertyName=$true)]
+[switch]$list
 
 )
 
-    #makes the connection HTTPS
-    if(!$notHTTPS){
-        $s = "s"
+     If ($PSBoundParameters['Debug']) {
+        $DebugPreference = 'Continue'
     }
 
-    #Sets the token header
-    $header = @{"X-API-Token" = "$token"}
+    Write-Debug "Provide PSBoundParameters Get-BarracudaCGFFirewallRule" 
+
+   #sets any default variables to parameters in $PSBoundParameters
+    foreach($key in $MyInvocation.MyCommand.Parameters.Keys)
+    {
+        $value = Get-Variable $key -ValueOnly -EA SilentlyContinue
+        if($value -and !$PSBoundParameters.ContainsKey($key)) {$PSBoundParameters[$key] = $value}
+        Write-Debug "$($key) : $($value)"
+    }
 
 
-    if($expand){
-        $expansion = "?expand=true"
-    }else{
-        $expansion = "?expand=false"
-    }
-    if($list){
-        $list = "lists/$(list)/"
-    }
+
+
+    <#
 #defines the URL to call
     if($cc){
         $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
@@ -123,31 +128,36 @@ ValueFromPipelineByPropertyName=$true)]
             }
           
         }
-    }
+    }#>
+
+
 
     if($range -and !$cluster){
         Write-Error "Partial Control Center information supplied, please change range, cluster and box info"
     }
 
-    if($PSBoundParameters.ContainsKey("Debug")){
-    #Note - the function will return any values in the pipeline, so always use Write-Host 
-        Write-Verbose $PSBoundParameters
-    }
-   
-      
-    if($PSBoundParameters.ContainsKey("Debug")){
-        Write-Verbose $postParams
-        Write-Verbose $url
-        Write-Verbose $data
 
-        try{
-            $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing -Debug
-        }catch [System.Net.WebException] {
-                $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
-                Write-Error $results
-                throw   
-            }
+   
+#Sets the token header
+    $header = @{"X-API-Token" = "$token"}
+
+    #Inserts the tail of the API path to the parameters 
+    $PSBoundParameters["context"] = "rules"
+
+    #builds the REST API path.
+    $url = Set-RESTPath @PSBoundParameters
+
+    #expansion after all other paths.
+    if($details){
+        $url = $url + "?expand=true"
     }else{
+        $url = $url +  "?expand=false"
+    }
+
+
+
+    #Write-Debug $postParams
+    Write-Debug $url
         
         try{
             $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing
@@ -157,7 +167,7 @@ ValueFromPipelineByPropertyName=$true)]
                 throw   
             }
 
-    }
+
 
 return ConvertFrom-Json $results.content
 }

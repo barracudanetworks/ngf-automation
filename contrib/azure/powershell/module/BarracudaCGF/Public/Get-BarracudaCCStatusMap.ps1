@@ -1,4 +1,4 @@
-Function Get-BarracudaCGFStatus{
+Function Get-BarracudaCCStatusMap{
 <#
 .Synopsis
     Gets the status of the CGF
@@ -24,7 +24,10 @@ param(
 [string] $token,
 [Parameter(Mandatory=$false,
     ValueFromPipelineByPropertyName=$true)]
-[switch]$notHTTPs
+[switch]$notHTTPs,
+[Parameter(Mandatory=$false,
+    ValueFromPipelineByPropertyName=$true)]
+[int]$range
 )
 
     #makes the connection HTTPS
@@ -35,8 +38,12 @@ param(
     #Sets the token header
     $header = @{"X-API-Token" = "$token"}
 
-	try{
-		$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box" -Method GET -Headers $header -UseBasicParsing 
+    try{
+	    if($range){
+            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/ranges/$($range)/statusmap" -Method GET -Headers $header -UseBasicParsing
+        }else{
+           	$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/statusmap" -Method GET -Headers $header -UseBasicParsing
+        }
 	}catch [System.Net.WebException] {
                 $Error[0] | Get-ExceptionResponse
                 throw   

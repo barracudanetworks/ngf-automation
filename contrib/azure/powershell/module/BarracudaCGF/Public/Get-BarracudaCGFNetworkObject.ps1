@@ -39,6 +39,9 @@ param(
 [string]$box,
 [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
 [string] $token,
+[Parameter(Mandatory=$false,
+ValueFromPipelineByPropertyName=$true)]
+[switch]$details,
 [switch]$notHTTPs
 )
 
@@ -70,7 +73,7 @@ param(
         $url = "http$($s)://$($deviceName):$($devicePort)/rest/firewall/v1$($url_insert)objects/networks"
     }
 
-    #>
+    
 
     if($cc){
         $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
@@ -103,21 +106,46 @@ param(
             $url = $url + "/forwarding-firewall/objects/networks/$($networkObjectName)"
         }
     }
+    #>
+
+    If ($PSBoundParameters['Debug']) {
+        $DebugPreference = 'Continue'
+    }
+
+    Write-Debug "Provide PSBoundParameters" 
+
+   #sets any default variables to parameters in $PSBoundParameters
+    foreach($key in $MyInvocation.MyCommand.Parameters.Keys)
+    {
+        $value = Get-Variable $key -ValueOnly -EA SilentlyContinue
+        if($value -and !$PSBoundParameters.ContainsKey($key)) {$PSBoundParameters[$key] = $value}
+        Write-Debug "$($key) : $($value)"
+    }
+
+        #Sets the token header
+    $header = @{"X-API-Token" = "$token"}
+
+    #Inserts the tail of the API path to the parameters 
+    $PSBoundParameters["context"] = "objects/networks"
+
+    #builds the REST API path.
+    $url = Set-RESTPath @PSBoundParameters
+
+    #Provide a specific object
+    if($objectName){
+        $url = $url + "/$($PSBoundParameters.("objectName"))"
+    }
     
-    if($PSBoundParameters.ContainsKey("Debug")){
-    #Note - the function will return any values in the pipeline, so always use Write-Host 
-        Write-Output $PSBoundParameters
-        Write-Output $url
-        try{
-			$results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method Get -Headers $header -UseBasicParsing -Debug 
-			if((ConvertFrom-Json $results.Content).objects){
-		        return (ConvertFrom-Json $results.Content).objects
-            }else{
-                return ConvertFrom-Json $results.Content
-            }
-        }catch{
-            Write-Output $_.Exception.Message
-        }
+    #Provide additional details of objects
+    if($details){
+
+        $url = $url + "?expand=true"
+    }
+    
+    
+    if(!$deviceName -and !$token){
+        Write-Error "No device or token provided!"
+
     }else{
         try{
 			$results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method Get -Headers $header -UseBasicParsing

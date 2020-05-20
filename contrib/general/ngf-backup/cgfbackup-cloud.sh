@@ -28,7 +28,7 @@ case $i in
     -c=*|--container=*)
     CONTAINER="${i#*=}"
     ;;
-	--default)
+    --default)
     DEFAULT=YES
     ;;
     *)

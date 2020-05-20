@@ -19,22 +19,22 @@ Set-BarracudaCGFtoIgnoreSelfSignedCerts -allowSelfSigned -noCRL
 $barracudacc = "youriphere"
 $barracudacctoken = "tokenhere"
 
-$cluster = "NorthCentralUS8" #This is the CC Cluster
+$cluster = "NorthCentralUS8" #This is the CC Cluster that my firewall is managed in
 $range = 1  #This is the CC range
 #$devicePort = 8443 # -left this commented out ast the default is 8443
-$box = "MYFIREWALLNAME"
-$servicename = "NGFW"
+$box = "MYFIREWALLNAME" #The name of your firewall
+$servicename = "NGFW" #The service of the firewall ruleset if different. 
 #In this example I create a seperate rule list to insert my imported rules into. I could remove the -listname $rulelist name below and write direct to the main firewall ruleset.
-$rulelistname = "AzureFWRul"
+$rulelistname = "AzureFWRul" 
 
 #This example uses offline firewall rules and IP groups in a CSV format
 $offlinesourcefile = ".\FirewallRules.csv"
 $offlineipgroupfile = ".\ipg.csv"
 $offlineaction = "Allow"
 
-
-$VerbosePreference = "Continue"
-$DebugPreference = "SilentlyContinue"
+#Uncomment these if you want loads of info!
+#$VerbosePreference = "Continue"
+#$DebugPreference = "SilentlyContinue"
 
 ./AzureFW_to_BarracudaCGF_Conversion.ps1 -deviceName $barracudacc -token $barracudacctoken -range $range -cluster $cluster -serviceName $servicename -box $box `
 -listName $rulelistname -offlinesourcefile $offlinesourcefile -offlineipgroupfile $offlineipgroupfile -offlineaction Allow -removeduplicates $true 

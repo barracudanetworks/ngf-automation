@@ -6,7 +6,6 @@ This script will take the Azure firewall ruleset and transfer it into a Barracud
 It can be ran online of offline (via the provision of CSV files), when online you need to login to Azure first and supply details for the Azure FW to take the rules from. The script will query for what it requires.
 
 
-
 ```powershell
 
 #Assuming you use self signed certs then leave this in place, as it makes some exceptions to Powershells default handling.

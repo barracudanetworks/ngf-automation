@@ -1,0 +1,6 @@
+Name,SourceAddresses,SourceIpGroups,DestinationAddresses,DestinationIpGroups,DestinationPorts,Description,Protocols
+LetThisThrough,"172.16.137.0/24,172.16.138.4,172.168.138.5",,172.16.136.0/24,,5060,,"TCP,UDP"
+ICMP,*,,*,,*,,ICMP
+allowtoInternet,"172.16.137.0/24,172.16.138.0/24",,*,,*,,"TCP,UDP"
+lotsOfPortsApp,"172.16.138.4,172.16.138.5,172.16.138.6",,"172.16.137.4,172.16.137.5",,"8,000,808,084,439,440",,TCP
+blockThisGroup,,myipgroup,*,,*,,"TCP,UDP,ICMP,Any"

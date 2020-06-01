@@ -1,0 +1,3 @@
+[submodule "contrib/powershell/module/barracudacgf"]
+	path = contrib/powershell/module/barracudacgf
+	url = https://github.com/gallen-bar/barracudacgf.git

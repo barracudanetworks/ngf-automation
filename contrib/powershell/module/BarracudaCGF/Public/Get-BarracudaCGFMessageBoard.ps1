@@ -17,8 +17,10 @@ param(
 [string]$deviceName,
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
 [string] $devicePort="8443",
-[Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+[Parameter(Mandatory=$false,ValueFromPipeline=$true)]
 [string] $token,
+[Parameter(Mandatory=$false,ValueFromPipeline=$true)]
+$creds,
 [switch]$notHTTPs
 )
 
@@ -31,7 +33,12 @@ param(
     $header = @{"X-API-Token" = "$token"}
 
 	try{
-		$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/motd" -Method GET -Headers $header -UseBasicParsing 
+        if($creds){
+		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/motd" -Method GET -Headers $header -Credential $creds -UseBasicParsing 
+        }else{
+            $header = @{"X-API-Token" = "$token"}
+		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/motd" -Method GET -Headers $header -UseBasicParsing 
+        }
 	}catch{
 		Write-Error("Unable to Login to API http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/motd due to " + $_.Exception)
 	}

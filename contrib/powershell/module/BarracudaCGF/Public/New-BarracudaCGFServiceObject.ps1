@@ -15,7 +15,7 @@ v0.1
 Function New-BarracudaCGFServiceObject {
 [cmdletbinding()]
 param(
-#if no device details are provided a powershell object is created.
+#below parameters are about the connection to the API
 [Parameter(Mandatory=$true,
 ValueFromPipelineByPropertyName=$true)]
 [string]$deviceName,
@@ -28,7 +28,11 @@ ValueFromPipelineByPropertyName=$false)]
 ValueFromPipelineByPropertyName=$true)]
 [string] $devicePort=8443,
 
-#the below parameters define the ruleset to create the object in
+[Parameter(Mandatory=$false,
+ValueFromPipelineByPropertyName=$false)]
+[switch]$notHTTPs,
+
+#below parameters are used to define the api path being used. contain settings for CC, forwarding or host ruleset.
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
 [string]$virtualServer,
@@ -51,17 +55,19 @@ ValueFromPipelineByPropertyName=$true)]
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
-[switch]$notHTTPs,
-
-[Parameter(Mandatory=$false,
-ValueFromPipelineByPropertyName=$false)]
 [switch]$hostfirewall,
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
 [switch]$ccglobal,
 
-# Below are the values that define the object
+[Parameter(Mandatory=$false,
+ValueFromPipelineByPropertyName=$false)]
+[switch]$fwdingfw,
+
+#above parameters can be considered stock over all general rules.
+
+# the below parameters define the object
 
 [Parameter(Mandatory=$true,
 ValueFromPipelineByPropertyName=$true)]
@@ -85,63 +91,7 @@ ValueFromPipelineByPropertyName=$true)]
 
 )
 
-    <#
-
-        if($range -or $cluster -or $ccglobal){
-        #REST Path for CC
-        $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
-        
-        if($range -and $cluster -and $serverName -and $serviceName){
-        #Forwarding ruleset via CC for v7
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/servers/$($PSBoundParameters.("serverName"))/services/$($PSBoundParameters.("serviceName"))"
-        }elseif($range -and $cluster -and $box -and $serviceName){
-        #Forwarding ruleset via CC for v8 
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/boxes/$($PSBoundParameters.("box"))/service-container/$($PSBoundParameters.("serviceName"))"
-        }elseif($range -and $cluster -and $box){
-        #Host ruleset via CC for a box
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/boxes/$($PSBoundParameters.("box"))"
-        #}elseif($range -and $cluster -and $serviceName){
-        #
-        #    $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/services/$($PSBoundParameters.("serviceName"))"
-        }elseif($range -and $cluster){
-        #Service objects for a cluster in CC
-              $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))"
-        }elseif($range){
-        #Service objects for a Range in CC
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))"
-        }
-        elseif($ccglobal){
-        #assume global
-            $url = $url + "/global"
-        }
-
-        #Finishes the URL path.
-        if($sharedfirewall){
-             $url = $url + "/shared-firewall/$($PSBoundParameters.("sharedfirewall"))/objects/services"
-        }else{
-            $url = $url + "/firewall/objects/services"
-        }
-
-     
-    }else{
-    #Direct Firewall paths
-        $url = "http$($s)://$($deviceName):$($devicePort)/rest/config/v1"
-        if($serviceName -and $serverName){
-        #v7 forwarding service objects
-            $url = $url + "/servers/$($PSBoundParameters.("serverName"))/services/$($PSBoundParameters.("serviceName"))/firewall/objects/services"
-
-        }elseif($serviceName){
-        #v8 forwarding objects
-            $url = $url + "/service-container/$($PSBoundParameters.("serviceName"))/firewall/objects/services"
-        
-        }elseif($fwdingfw){
-            $url = $url + "/forwarding-firewall/objects/services"
-        }else{
-        #in the absence of any service or server info get the host ruleset
-             $url = $url + "/box/firewall/objects/services"
-        }
-    }
-    #>
+ 
     If ($PSBoundParameters['Debug']) {
         $DebugPreference = 'Continue'
     }

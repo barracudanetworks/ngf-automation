@@ -19,9 +19,12 @@ param(
 ValueFromPipelineByPropertyName=$true)]
 [string]$deviceName,
 
-[Parameter(Mandatory=$true,
+[Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
 [string] $token,
+
+[Parameter(Mandatory=$false,ValueFromPipeline=$true)]
+$creds,
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
@@ -57,6 +60,10 @@ ValueFromPipelineByPropertyName=$true)]
 ValueFromPipelineByPropertyName=$false)]
 [switch]$hostfirewall,
 
+[Parameter(Mandatory=$false,
+ValueFromPipelineByPropertyName=$false)]
+[switch]$sharedfw,
+
 #The following parameters are for the position of the rule in ruleset
 
 [Parameter(Mandatory=$false,
@@ -89,57 +96,9 @@ ValueFromPipelineByPropertyName=$true)]
 
 
 
-
-    <#
-#defines the URL to call
-    if($cc){
-        $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
-        
-        if($range -and $cluster -and $serverName -and $serviceName){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/servers/$($PSBoundParameters.("serverName"))/services/$($PSBoundParameters.("serviceName"))"
-        }elseif($range -and $cluster -and $box){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/boxes/$($PSBoundParameters.("box"))"
-        }elseif($range -and $cluster -and $serviceName){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/services/$($PSBoundParameters.("serviceName"))"
-        }elseif($range -and $cluster){
-              $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))"
-        }elseif($range){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))"
-        }
-        else{
-        #assume global
-            $url = $url + "/global"
-        }
-        if($sharedfw){
-             $url = $url + "/shared-firewall/rules$($list)$($expansion)"
-        }else{
-            $url = $url + "/firewall/rules/$($list)$($expansion)"
-        }
-    }else{
-        $url = "http$($s)://$($deviceName):$($devicePort)/rest/config/v1"
-        if($hostfirewall){
-            $url = $url + "/box/firewall/rules/lists/$($expansion)"
-        }else{
-            if($serviceName -and $virtualServer){
-               $url = $url + "/servers/$($virtualServer)/services/$($serviceName)/firewall/rules/$($list)$($expansion)"
-            }else{
-            $url = $url + "/forwarding-firewall/rules.$($list)$($expansion)"
-
-            }
-          
-        }
-    }#>
-
-
-
     if($range -and !$cluster){
         Write-Error "Partial Control Center information supplied, please change range, cluster and box info"
     }
-
-
-   
-#Sets the token header
-    $header = @{"X-API-Token" = "$token"}
 
     #Inserts the tail of the API path to the parameters 
     $PSBoundParameters["context"] = "rules"
@@ -160,7 +119,13 @@ ValueFromPipelineByPropertyName=$true)]
     Write-Debug $url
         
         try{
-            $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing
+            if($creds){
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -Credential $creds -UseBasicParsing
+            }else{
+                #Sets the token header
+                $header = @{"X-API-Token" = "$token"}
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing
+            }
         }catch [System.Net.WebException] {
                 $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                 Write-Error $results

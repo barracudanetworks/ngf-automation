@@ -16,7 +16,7 @@ Function New-BarracudaCGFNetworkObject {
     [cmdletbinding()]
 #If none of these are supplied it returns the code
 
-    param(
+param(
         [Parameter(Mandatory=$false,
         ValueFromPipelineByPropertyName=$true)]
         [string]$deviceName,
@@ -29,6 +29,7 @@ Function New-BarracudaCGFNetworkObject {
         ValueFromPipelineByPropertyName=$true)]
         [string] $devicePort=8443,
 
+#below parameters are used to define the api path being used. contain settings for CC, forwarding or host ruleset.
         [Parameter(Mandatory=$false,
         ValueFromPipelineByPropertyName=$true)]
         [string]$virtualServer,
@@ -39,15 +40,38 @@ Function New-BarracudaCGFNetworkObject {
 
         [Parameter(Mandatory=$false,
         ValueFromPipelineByPropertyName=$true)]
+        [string]$range,
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$cluster,
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$box,
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [switch]$hostfirewall,
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [switch]$ccglobal,
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$false)]
+        [switch]$sharedfw,
+
+#above parameters can be considered stock over all general rules.
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
         [string]$name,
 
         [Parameter(Mandatory=$true,
         ValueFromPipelineByPropertyName=$true)]
         [ValidateSet("generic","singleIPv4Address","listIPv4Address","singleIPv4Network","listIPv4Network","hostname","singleIPv6Address","listIPv6Address","singleIPv6Network","listIPv6Network")] 
         [string]$type="generic",
-
-        # Below are the values
-
 
         [Parameter(Mandatory=$false,
         ValueFromPipelineByPropertyName=$true)]
@@ -79,31 +103,9 @@ Function New-BarracudaCGFNetworkObject {
 
         [Parameter(Mandatory=$false,
         ValueFromPipelineByPropertyName=$true)]
-        [string]$comment,
+        [string]$comment
 
-        [Parameter(Mandatory=$false,
-        ValueFromPipelineByPropertyName=$true)]
-        [string]$range,
-
-        [Parameter(Mandatory=$false,
-        ValueFromPipelineByPropertyName=$true)]
-        [string]$cluster,
-
-        [Parameter(Mandatory=$false,
-        ValueFromPipelineByPropertyName=$true)]
-        [string]$box,
-
-        [Parameter(Mandatory=$false,
-        ValueFromPipelineByPropertyName=$false)]
-        [switch]$notHTTPs,
-        [Parameter(Mandatory=$false,
-        ValueFromPipelineByPropertyName=$true)]
-        [switch]$ccglobal
-        <#
-        [Parameter(Mandatory=$false,
-        ValueFromPipelineByPropertyName=$false)]
-        [switch]$hostfirewall
-        #>
+        
     )
 
     
@@ -196,7 +198,7 @@ Function New-BarracudaCGFNetworkObject {
     if($PSBoundParameters.geo){
         $postParams.Add("geo",$PSBoundParameters.geo)
     }
-    $postParams.Add("comments",$comments)
+    $postParams.Add("comment",$comment)
 
 
     #references need to be hashtables inside array

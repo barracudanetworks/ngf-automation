@@ -96,21 +96,33 @@ fi
     /opt/phion/bin/phionar cdl "$LOGDIR/$FILENAME2" *
     gzip "$LOGDIR/$FILENAME2"   
   fi
-  echo
 
-  echo "-------------------------------------------------------------------------"
-  echo " Transfer to Azure Storage Account $AZURE_STORAGE_ACCOUNT in blob $BLOB_CONTAINER" 
-  echo
+if [ ! -z "$S3BUCKET" ]; 
+then
+	echo "-------------------------------------------------------------------------"
+	echo " Transfer to AWS S3 bucket: $S3BUCKET/$CONTAINER" 
+	echo
+
+ fi    
+
+if [ ! -z "$STORAGEACCOUNT" ];  
+then
+	echo "-------------------------------------------------------------------------"
+	echo " Transfer to Azure cloud storage account: $STORAGEACCOUNT/$CONTAINER" 
+	echo 
+    
+fi
+
 
 if [ ! -z "$S3BUCKET" ];
 then
-    aws s3 cp "$LOGDIR/$FILENAMEGZ" s3://$S3BUCKET/
-    aws s3 cp "$LOGDIR/$FILENAMEGZ2" s3://$S3BUCKET/
+    /opt/aws/bin/aws s3 cp "$LOGDIR/$FILENAMEGZ" s3://$S3BUCKET/
+    /opt/aws/bin/aws s3 cp "$LOGDIR/$FILENAMEGZ2" s3://$S3BUCKET/
 fi
 if [ ! -z "$STORAGEACCOUNT" ];  
 then
-    az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAMEGZ" --name  $FILENAME2
-    az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAMEGZ2" --name $FILENAME2
+    az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAMEGZ" --name  $FILENAMEGZ
+    az storage blob upload --account-name $STORAGEACCOUNT --container $CONTAINER --file "$LOGDIR/$FILENAMEGZ2" --name $FILENAMEGZ2
   fi
   
   echo

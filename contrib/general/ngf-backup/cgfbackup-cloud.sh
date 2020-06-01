@@ -28,7 +28,7 @@ case $i in
     -c=*|--container=*)
     CONTAINER="${i#*=}"
     ;;
-    --default)
+	--default)
     DEFAULT=YES
     ;;
     *)
@@ -91,12 +91,28 @@ FILENAME=$VM`date +%Y_%m_%d_%H_%M`.par
   fi
   echo
 
-  echo "-------------------------------------------------------------------------"
-  echo " Transfer to Azure Storage Account $STORAGEACCOUNT in blob $CONTAINER" 
-  echo
+
+if [ ! -z "$S3BUCKET" ]; 
+then
+	echo "-------------------------------------------------------------------------"
+	echo " Transfer to AWS cloud storage account: $S3BUCKET/$CONTAINER" 
+	echo
+
+ fi    
+
+if [ ! -z "$STORAGEACCOUNT" ];  
+then
+	echo "-------------------------------------------------------------------------"
+	echo " Transfer to Azure cloud storage account: $STORAGEACCOUNT/$CONTAINER" 
+	echo 
+    
+fi
+
+
+
   if [ ! -z "$S3BUCKET" ]; 
   then
-      aws s3 cp "$LOGDIR/$FILENAME" s3://$S3BUCKET/
+      /opt/aws/bin/aws s3 cp "$LOGDIR/$FILENAME" s3://$S3BUCKET/
   fi
   if [ ! -z "$STORAGEACCOUNT" ]; 
   then

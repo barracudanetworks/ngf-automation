@@ -30,7 +30,8 @@ TO="[EMAIL-TO]"
 SUBJECT="Backup CloudGen Firewall F-Series - $TODAY"
 
 # Backup filename
-FILENAME=NGF-box_`date +%Y_%m_%d_%H_%M`.par
+HOSTNAME=`hostname`
+FILENAME=${HOSTNAME}_`date +%Y_%m_%d_%H_%M`.par
 
 # Creating the log directory
 if [ ! -d "$LOGDIR" ];

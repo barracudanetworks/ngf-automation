@@ -2,6 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+/.vs/*
 /.vs/ngf-automation/v15
 /.vs/slnx.sqlite
 /contrib/azure/python/multiip_fwrule_rewrite (2).py
@@ -12,3 +13,6 @@
 /contrib/azure/powershell/BarracudaCGF
 /contrib/azure/powershell/campus/ngfdeployment/test
 /.vs/tasks.vs.json
+/.vs/PythonSettings.json
+/contrib/terraform/go-ciscoasa-master
+/contrib/terraform/barracudacgf/.vscode

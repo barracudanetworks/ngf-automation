@@ -6,7 +6,7 @@
 # | |_) | (_| | |  | | | (_| | (__| |_| | (_| | (_| |
 # |____/ \__,_|_|  |_|  \__,_|\___|\__,_|\__,_|\__,_|
 #                                                    
-# Backup script for the Barracuda NextGen Firewall F-Series.
+# Backup script for the Barracuda CloudGen Firewall F-Series.
 # The backup destination is a FTP server.
 #
 # AUTHOR: Joeri Van Hoof (jvanhoof@barracuda.com)
@@ -24,7 +24,7 @@ SMTPNOTIFICATION=true
 SMTPSERVER='mail.barracuda.com'
 FROM="jvanhoof@barracuda.com"
 TO="jvanhoof@barracuda.com"
-SUBJECT="Backup NextGen Firewall F-Series - $TODAY"
+SUBJECT="Backup CloudGen Firewall F-Series - $TODAY"
 
 # Backup filename
 FILENAME=NGF-box_`date +%Y_%m_%d_%H_%M`.par
@@ -33,7 +33,7 @@ FILENAME=NGF-box_`date +%Y_%m_%d_%H_%M`.par
 if [ ! -d "$LOGDIR" ];
 then
   echo
-  echo "Creating local log directory ($LOG) on Barracuda NextGen Firewall F-Series ..."
+  echo "Creating local log directory ($LOG) on Barracuda CloudGen Firewall F-Series ..."
   mkdir -p $LOGDIR
 fi
 
@@ -45,7 +45,7 @@ DSTPATH="/"
 
 {
   echo "-------------------------------------------------------------------------" 
-  echo " Backup script for Barracuda NextGen Firewall F-Series" 
+  echo " Backup script for Barracuda CloudGen Firewall F-Series" 
   echo " Date: $TODAY"
   echo
   echo "-------------------------------------------------------------------------" 

@@ -23,12 +23,11 @@ This script provides a simple extension of the failover process in AWS that swit
 
 
 
-5.  prepare the FW rules by pre-creating the dynamic objects, to allow you to create the right type take the project file 'network_object_template.conf' and
-copy it into a text editor. For each Elastic IP you wish to associate you must create an object by following the below steps. 
-	a.  Search for the string "yourassociationid" in the conf file, replace this text with the association ID
-    ![AWS Elastic IP](images/modifiedscriptexample.png).
-    <b.  Once edited Select All into your clipboard
-	c.  Go to Forwarding Firewall Rules, Network Objects and right click and Paste
+5.  prepare the FW rules by pre-creating the dynamic objects, to allow you to create the right type take the project file 'network_object_template.conf' and copy it into a text editor. For each Elastic IP you wish to associate you must create an object by following the below steps. 
+	5a.  Search for the string "yourassociationid" in the conf file, replace this text with the association ID
+    ![AWS Elastic IP](images/modifiedscriptexample.png) 
+    5b.  Once edited Select All into your clipboard
+	5c.  Go to Forwarding Firewall Rules, Network Objects and right click and Paste
     
 You should now have new object entry named after the EIP allocation ID  It is critical all these names match exactly. The entry e.g 'sourceFile={external.eipalloc-08201f6beaafcc669.conf}' is the filename that the script will create on the filesystem of the CGF.
 
@@ -38,15 +37,15 @@ You should now have new object entry named after the EIP allocation ID  It is cr
 1. In a suitable editor modify the contents of /primaryscript/failover.sh to associate your elastic IP allocation ID's to each private IP assigned to the network interface of the primary firewall. 
 2. Now repeat for the script in /secondaryscript/failover.sh, use the same IP allocation ID's but this time change the private IP's to those assigned to the secondary firewall. 
 3. With the scripts modified for each filewall to install then, first enable SSH access.  
-4. On each firewall using the following command create a customscripts directory <code>mkdir /customscripts </code>
+4. On each firewall using the following command create a customscripts directory `mkdir /customscripts `
 5. Copy the multiip_object_rewrite.py into the new /customscripts directory
-6. Adjust the permissions on the script <code># chmod 755 /customscripts/multiip_object_rewrite.py</code> 
+6. Adjust the permissions on the script `# chmod 755 /customscripts/multiip_object_rewrite.py ` 
 
 7. On the primary firewall copy the the failover.sh located in the primaryscript directory into the /customscripts directory.
-8. Verify and make sure the script is executable: <code># chmod 755 /customscripts/failover.sh</code>
+8. Verify and make sure the script is executable: ` # chmod 755 /customscripts/failover.sh `
 9. On the secondary firewall copy the the failover.sh located in the secondaryscript directory into the /customscripts directory.
-10. Verify and make sure the script is executable: <code># chmod 755 /customscripts/failover.sh</code>
-11. To trigger the script on failover, go to Configuration Tree > Infrastructure Services > Control <li>
+10. Verify and make sure the script is executable: ` # chmod 755 /customscripts/failover.sh`
+11. To trigger the script on failover, go to Configuration Tree > Infrastructure Services > Control 
 12. Lock the config and enable Configuration Mode - Advanced. 
 13. Go into the new Custom Scripts menu item that has appeared and paste into the Start Script box. ![CGF Network configuration Network Architecture](images/customscripts.png) 
         * Replace the value CSC - with the name of your firewall if it is in Control Center

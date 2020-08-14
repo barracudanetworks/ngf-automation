@@ -8,7 +8,7 @@ This script provides a simple extension of the failover process in AWS that swit
 
 <ol>
 <li>From the AWS EC2 portal, create the required elastic IP address and take a note of their allocation ID's
-![AWS Elastic IP](images/eiplist.png). 
+![AWS Elastic IP](images/eiplist.png)
 </li>
 <li>In the AWS EC2 portal, assign additional IP addresses to the interface of the Primary Firewall. 
 ![AWS Elastic IP](images/additionalIP.png).

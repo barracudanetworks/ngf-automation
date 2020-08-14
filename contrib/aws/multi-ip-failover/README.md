@@ -59,7 +59,6 @@ The scripts should be ready, now create the objects for them to update.
     ![Example Firewall Rule](images/updated_rule.png)
     
     
-</ol>
 
 ## Using the IP's for outbound connections. 
 

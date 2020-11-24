@@ -35,7 +35,7 @@ def main():
 	parser.add_option("-c", "--configpath", default='/opt/phion/config/active/', help="source path of log files to upload")
 	parser.add_option("-l", "--logfilepath", default='/phion0/logs/multi_ip_replace.log', help="logfile path and name")
 	parser.add_option("-s", "--servicename", default='NGFW', help="name of the NGFW service")
-	parser.add_option("-i", "--servername", default='CSC', help="name of second ip address")
+	parser.add_option("-i", "--servername", default='CSC', help="name of virtual server")
 	
 	# parse argsbox
 	(options, args) = parser.parse_args()

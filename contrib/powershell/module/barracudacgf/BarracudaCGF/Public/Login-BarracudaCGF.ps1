@@ -16,7 +16,7 @@ ValueFromPipelineByPropertyName=$false)]
 
 [Parameter(Mandatory=$true,
 ValueFromPipelineByPropertyName=$false)]
-[string] $password,
+$password,
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
@@ -48,7 +48,7 @@ ValueFromPipelineByPropertyName=$false)]
     
     $postParams = @{}
     $postParams.Add("username",$name)
-    $postParams.Add("password",$comments)
+    $postParams.Add("password",$password)
     
     $data = ConvertTo-Json $postParams -Depth 99
     

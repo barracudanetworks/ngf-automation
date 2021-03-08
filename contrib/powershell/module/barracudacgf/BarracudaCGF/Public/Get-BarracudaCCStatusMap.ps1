@@ -40,9 +40,9 @@ param(
 
     try{
 	    if($range){
-            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/ranges/$($range)/statusmap" -Method GET -Headers $header -UseBasicParsing
+            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/ranges/$($range)/statusmap" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
         }else{
-           	$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/statusmap" -Method GET -Headers $header -UseBasicParsing
+           	$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/statusmap" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
         }
 	}catch [System.Net.WebException] {
                 $Error[0] | Get-ExceptionResponse

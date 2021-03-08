@@ -185,7 +185,7 @@ Function Set-BarracudaCGFLicense {
 
         
             try{
-                $results = Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/licenses/activate"  -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing
+                $results = Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/licenses/activate"  -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
             }catch [System.Net.WebException] {
                     $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                     Write-Error $results

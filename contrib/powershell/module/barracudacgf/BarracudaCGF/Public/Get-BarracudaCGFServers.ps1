@@ -33,11 +33,11 @@ $creds,
 
     try{
         if($creds){
-		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/servers" -ContentType 'application/json' -Method GET -Headers $header -Credential $creds -UseBasicParsing 
+		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/servers" -ContentType 'application/json' -Method GET -Headers $header -Credential $creds -UseBasicParsing -SkipCertificateCheck
         }else{
             #Sets the token header
             $header = @{"X-API-Token" = "$token"}
-            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/servers" -ContentType 'application/json' -Method GET -Headers $header -UseBasicParsing
+            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/servers" -ContentType 'application/json' -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
         }
 		$results = (ConvertFrom-Json $results.Content)
     }catch{

@@ -139,11 +139,11 @@ ValueFromPipelineByPropertyName=$true)]
         
         try{
             if($creds){
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -Credential $creds -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -Credential $creds -UseBasicParsing -SkipCertificateCheck
             }else{
                 #Sets the token header
                 $header = @{"X-API-Token" = "$token"}
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
             }
         }catch [System.Net.WebException] {
                 $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))

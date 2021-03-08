@@ -201,7 +201,7 @@ ValueFromPipelineByPropertyName=$false)]
         Write-Debug $url
                
             try{
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
                 if((ConvertFrom-Json $results.Content).objects){
 		            return (ConvertFrom-Json $results.Content).objects
                 }else{

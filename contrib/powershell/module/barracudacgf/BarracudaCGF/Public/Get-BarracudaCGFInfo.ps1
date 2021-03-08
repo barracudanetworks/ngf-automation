@@ -18,7 +18,7 @@ param(
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
 [string] $devicePort="8443",
 [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-[string] $token,
+[Securestring] $token,
 [switch]$notHTTPs
 )
 
@@ -28,10 +28,11 @@ param(
     }
 
     #Sets the token header
-    $header = @{"X-API-Token" = "$token"}
-
+   # $header = @{"X-API-Token" = "$token"}
+   $header = @{"X-API-Token" = "$($token | ConvertFrom-SecureString -AsPlainText)"}
+               
 	try{
-		$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/info" -Method GET -Headers $header -UseBasicParsing 
+		$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/info" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
 	}catch{
 		Write-Error("Unable to Login to API http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/info due to " + $_.Exception)
 	}

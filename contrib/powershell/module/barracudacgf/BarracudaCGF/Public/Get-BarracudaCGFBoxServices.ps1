@@ -36,7 +36,7 @@ param(
         Write-Output $PSBoundParameters
     }
     try{
-        $results = Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/services/$($ServiceName)" -ContentType 'application/json' -Method Get -Headers $header -UseBasicParsing
+        $results = Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/services/$($ServiceName)" -ContentType 'application/json' -Method Get -Headers $header -UseBasicParsing -SkipCertificateCheck
         if((ConvertFrom-Json $results.Content).services){
 		    return (ConvertFrom-Json $results.Content).services
         }else{

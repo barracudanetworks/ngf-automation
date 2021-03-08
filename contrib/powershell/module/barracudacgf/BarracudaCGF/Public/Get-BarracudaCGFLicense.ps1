@@ -36,7 +36,7 @@ Function Get-BarracudaCGFLicense{
         $header = @{"X-API-Token" = "$token"}
     
         try{
-            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/licenses" -Method GET -Headers $header -UseBasicParsing 
+            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/licenses" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
         }catch [System.Net.WebException] {
                     $Error[0] | Get-ExceptionResponse
                     throw   

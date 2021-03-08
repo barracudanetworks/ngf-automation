@@ -110,7 +110,7 @@ param(
 
     
 
-#defines the URL to call
+#defines the URL to call -passed out to Set-RESTPath function now.
  <#   if($cc){
    
      $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
@@ -237,7 +237,7 @@ param(
 
         
             try{
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
             }catch [System.Net.WebException] {
                     $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                     Write-Error $results

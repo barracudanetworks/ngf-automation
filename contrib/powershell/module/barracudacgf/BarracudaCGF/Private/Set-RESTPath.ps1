@@ -34,6 +34,15 @@ function Set-RESTPath {
         [Parameter(Mandatory=$false,
         ValueFromPipelineByPropertyName=$true)]
         [string]$box,
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [string]$servicename,
+
+        [Parameter(Mandatory=$false,
+        ValueFromPipelineByPropertyName=$true)]
+        [Alias("virtualServer")]
+        [string]$servername,
         
         [Parameter(Mandatory=$false,
         ValueFromPipelineByPropertyName=$true)]
@@ -72,6 +81,7 @@ function Set-RESTPath {
         if($range -and $cluster -and $serverName -and $serviceName){
         #Forwarding ruleset via CC for v7
             $url = $url + "/ranges/$($range)/clusters/$($cluster)/servers/$($servername)/services/$($serviceName)"
+           # $fullccpath = $true
         }elseif($range -and $cluster -and $box -and $serviceName){
         #Forwarding ruleset via CC for v8 
             $url = $url + "/ranges/$($range)/clusters/$($cluster)/boxes/$($box)/service-container/$($serviceName)"
@@ -101,7 +111,8 @@ function Set-RESTPath {
         } 
         elseif($listname){
             $url = $url + "/firewall/$($context)/lists/$($listname)"
-        }      
+        }
+            
         else{
             $url = $url + "/firewall/$($context)"
         }

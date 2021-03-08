@@ -62,7 +62,7 @@ param(
     $header = @{"X-API-Token" = "$token"}
 
     try{
-           	$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/ranges/$($range)/clusters/$($cluster)/boxes$($getextra)" -Method GET -Headers $header -UseBasicParsing
+           	$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/ranges/$($range)/clusters/$($cluster)/boxes$($getextra)" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
        
 	}catch [System.Net.WebException] {
                 $Error[0] | Get-ExceptionResponse

@@ -102,10 +102,13 @@ then
         if [ ! -z "$PIP" ];  
         then
            az network nic ip-config update --name $IPCONFIG --nic-name $OTHERNIC --resource-group $RG --public-ip-address $SECONDPIP
+           SECONDRESULT=$(az network public-ip list --query "[?ends_with(to_string(ipConfiguration.id), '$IPCONFIG')] | [?contains(to_string(ipConfiguration.id), '$OTHERNIC')].name" -o tsv)
+          echo "$TODAY - Get current PIP $SECONDRESULT" >> $LOG 2>&1
         fi
 
         #Validate that IP moved. by searching for what PIP is allocated to this NIC
         RESULT=$(az network public-ip list --query "[?ends_with(to_string(ipConfiguration.id), '$IPCONFIG')] | [?contains(to_string(ipConfiguration.id), '$NIC')].name" -o tsv)
+
 
         echo "$TODAY - Get current PIP $RESULT" >> $LOG 2>&1
        

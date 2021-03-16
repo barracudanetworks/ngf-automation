@@ -77,7 +77,7 @@ then
 
     #Get the Name of the other VM
     OTHER=$(az vm list --query "[?name!='$VM'].{name:name}" -o tsv)
-    echo "$TODAY - Get other VM Name $OTHERVM" >> $LOG 2>&1
+    echo "$TODAY - Get other VM Name $OTHER" >> $LOG 2>&1
     #Get the NIC ID of the other VM
     OTHERID=$(az vm show --name $OTHER -g $RG --query 'networkProfile.networkInterfaces[0].id' -o tsv)
     echo "$TODAY - Get the other VM NIC ID $OTHERID" >> $LOG 2>&1

@@ -24,9 +24,10 @@ The CloudGen Firewalls must be configured with managed identities, the firewall 
         <ol>
         <li>Go to Configuration Tree > Infrastructure Services > Control</Li>
         <li>Go to Custom Scripts and Lock the config
-        <li>Enter into the Start Script your details <code>/root/customscripts/ipshifting.sh -i="ipconfig" -p="publicIPname"</code>
+        <li>Enter into the Start Script your details <code>/root/customscript/ipshifting.sh -i="ipconfig" -p="publicIPname"</code>
         </ol>
         </li>
+    <li> Optionally, if you wish to block a service while the script runs add <code> -b="SERVERNAME SERVICENAME" </code> e.g <code> -b="CSC VPN"</code>. The script will automatically hold the service blocked for 5 minutes. 
 </ol>
 
 With this done the script will trigger upon failover and move an IP address between hosts. To move Multiple IP addresses trigger multiple scripts with different public IP and ipconfig values.

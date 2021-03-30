@@ -27,6 +27,9 @@ case $i in
     -s=*|--secondpip=*)
     SECONDPIP="${i#*=}"
     ;;
+    -b=*|--block=*)
+    BLOCKSVC="${i#*=}"
+    ;;
     --default)
     DEFAULT=YES
     ;;
@@ -38,8 +41,9 @@ done
 
 # Local logging adapt the LOGDIR variable to the directory where script is installed.
 TODAY=`date +"%Y-%m-%d %T"`
+DATE=`date +"%Y-%m-%d"`
 LOGDIR="/phion0/logs"
-LOG="$LOGDIR/ipshifting-$TODAY.log"
+LOG="$LOGDIR/ipshifting-$DATE.log"
 
 # Email Notification
 SMTPNOTIFICATION=true
@@ -56,6 +60,12 @@ echo "-------------------------------------------------------------------------"
 
 echo "$TODAY - Supplied PIP : $PIP" >> $LOG 2>&1
 echo "$TODAY - Supplied IPCONFIG: $IPCONFIG" >> $LOG 2>&1
+COUNTER=0
+
+if [ ! -z "$BLOCKSVC" ]; 
+then
+  phionctrl service block $BLOCKSVC
+fi
 
 if [ ! -z "$PIP" ];  
 then
@@ -130,6 +140,15 @@ then
       echo "$TODAY - FAILURE" >> $LOG 2>&1
   fi
     
+fi
+
+if [ ! -z "$BLOCKSVC" ]; 
+then
+  SLEEP=((300-$COUNTER*30))
+  echo "$TODAY - SLEEPING FOR $SLEEP before starting $BLOCKSVC" >> $LOG 2>&1
+  sleep $SLEEP
+  phionctrl service start $BLOCKSVC
+  echo "$TODAY - NOW STARTING $BLOCKSVC" >> $LOG 2>&1
 fi
 
 if [ "$SMTPNOTIFICATION" = true ]; then

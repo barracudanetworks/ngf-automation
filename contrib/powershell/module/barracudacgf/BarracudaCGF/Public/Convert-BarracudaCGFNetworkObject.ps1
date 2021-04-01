@@ -6,7 +6,8 @@
 	for the network object creation. 
 	At this time all objects inputted should be of the same type. 
 	The input is expected to be in normal notation e.d 10.2.3.0/24 and will be converted by the function to phion notation 10.2.3.0/8 
-	This will create an array like; @(@{'type'='ipV4';'ipV4'='13.67.153.16/28'})
+	This will create an array like; @(@{'type'='ipV4';'ipV4'='13.67.153.16/28'}) for v7 and 
+		@(@{entry=@{ip="13.67.153.16/28";comment="mycomment"}}) for version 8 firmware
 	From a CSV in the format;
 	type, addresses
 	ipV4, 10.7.3.0/24

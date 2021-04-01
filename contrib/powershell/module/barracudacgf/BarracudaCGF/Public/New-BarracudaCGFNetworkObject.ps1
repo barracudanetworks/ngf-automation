@@ -108,51 +108,7 @@ param(
         
     )
 
-    
-
-#defines the URL to call -passed out to Set-RESTPath function now.
- <#   if($cc){
-   
-     $url = "http$($s)://$($deviceName):$($devicePort)/rest/cc/v1/config"
-        
-        if($range -and $cluster -and $serverName -and $serviceName){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/servers/$($PSBoundParameters.("serverName"))/services/$($PSBoundParameters.("serviceName"))"
-        }elseif($range -and $cluster -and $box){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/boxes/$($PSBoundParameters.("box"))"
-        }elseif($range -and $cluster -and $serviceName){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))/services/$($PSBoundParameters.("serviceName"))"
-        }elseif($range -and $cluster){
-              $url = $url + "/ranges/$($PSBoundParameters.("range"))/clusters/$($PSBoundParameters.("cluster"))"
-        }elseif($range){
-            $url = $url + "/ranges/$($PSBoundParameters.("range"))"
-        }
-        else{
-        #assume global
-            $url = $url + "/global"
-        }
-        if($sharedfw){
-             $url = $url + "/shared-firewall/objects/networks"
-        }else{
-            $url = $url + "/firewall/objects/networks"
-        }
-
-        
-    }else{
-        $url = "http$($s)://$($deviceName):$($devicePort)/rest/config/v1"
-  <#      if($hostfirewall){
-            $url = $url + "/box/firewall/objects/networks"
-        }else{
-            if($serviceName -and $virtualServer){
-               $url = $url + "/servers/$($virtualServer)/services/$($serviceName)/firewall/objects/networks"
-            }else{
-            $url = $url + "/forwarding-firewall/objects/networks"
-
-            }
-          #  $url = $url + "/forwarding-firewall/objects/networks"
-        }
-
-        
-    }#>
+  
     If ($PSBoundParameters['Debug']) {
         $DebugPreference = 'Continue'
     }

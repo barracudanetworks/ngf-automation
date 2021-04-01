@@ -24,7 +24,7 @@ ValueFromPipelineByPropertyName=$true)]
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$false)]
-[Securestring] $token,
+[string] $token,
 
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
 [SecureString]$creds,

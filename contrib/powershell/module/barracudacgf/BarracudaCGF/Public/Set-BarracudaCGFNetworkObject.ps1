@@ -173,8 +173,7 @@ Function Set-BarracudaCGFNetworkObject {
     $postParams.Add("included",$includedObjects)
     
     #Converts to JSON
-    $data = ConvertTo-Json $postParams -Depth 99
-    
+    $data = ConvertTo-Json $postParams -Depth 99 
     
     #Sets the token header
     $header = @{"X-API-Token" = "$token"}

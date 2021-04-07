@@ -7,6 +7,7 @@ This script is a example of using the Azure CLI embedded on all v8 and above Fir
 
 ## Prequisits
 The CloudGen Firewalls must be configured with managed identities, the firewall identities must have Contributor permission over the resource group containing the network interfaces and public IP addresses of the firewall. 
+The Firewall managed identities must have write access over the subnet in the virtual network in which they are located.
 
 
 ## Installation 
@@ -33,3 +34,12 @@ The CloudGen Firewalls must be configured with managed identities, the firewall 
 With this done the script will trigger upon failover and move an IP address between hosts. To move Multiple IP addresses trigger multiple scripts with different public IP and ipconfig values.
 
 If you wish to switch IP's between Active and passive boxes it is a case of configuring the Stop Script to try to claim the other IP. If the box stops suddenly then this may not occur.
+
+
+### Troubleshooting
+If the script doesn't make changes as expected the try running elements manually, in particular test the line below which moves IP's
+`az network nic ip-config update --name $IPCONFIG --nic-name $OTHERNIC --resource-group $RG --remove "publicIpAddress"`
+
+If you receive this error then you do not have sufficient permission on the subnet into which the Firewalls NIC's are attached. You must edit the IAM permissions so that you have read/write permission to this subnet or if you cannot create custom roles, Contributor rights to the Virtual Network.
+
+![Assign Role ](images/permissionserror.png)

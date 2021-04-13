@@ -4,10 +4,17 @@
 	Gets a list of firewall rules within a list or a specific firewall rule in a list
 .Description
 	This function will collect a list of the firewall rules present in a firewall rule list, with the expand option set to true it will provide full details of all the rules.
+    If no other options are supplied it will assume it is collect the Box level rules on a standalone Firewall. 
 	This can be used to find a position within an existing ruleset to create a new rule, or just provide reporting.
+
+    Provide -serviceName to access the Forwarding Firewall ruleset
+    
 .Example
 	Get-BarracudaCGFFirewallRule -deviceName $dev_name -token $token -expand $true
 	Get-BarracudaCGFFirewallRule -deviceName $dev_name -token $token -list "MyRuleList" 
+    
+    Collect details of a specific rule in the forwarding firewall.
+    Get-BarracudaCGFFirewallRule -deviceName $dev_name -token $token -serviceName NGFW -name "MyFirewallRuleName"
 .Notes
 v0.1
 #>
@@ -64,6 +71,12 @@ ValueFromPipelineByPropertyName=$false)]
 ValueFromPipelineByPropertyName=$false)]
 [switch]$sharedfw,
 
+#specific rule name
+[Parameter(Mandatory=$false,
+ValueFromPipelineByPropertyName=$true)]
+[string]$name,
+
+
 #The following parameters are for the position of the rule in ruleset
 
 [Parameter(Mandatory=$false,
@@ -103,6 +116,12 @@ ValueFromPipelineByPropertyName=$true)]
     #Inserts the tail of the API path to the parameters 
     $PSBoundParameters["context"] = "rules"
 
+    #Added rule name variable and update the context if it has been set.
+    if($name){
+        #Inserts the tail of the API path to the parameters 
+        $PSBoundParameters["context"] = "rules/$($name)"
+    }
+
     #builds the REST API path.
     $url = Set-RESTPath @PSBoundParameters
 
@@ -120,11 +139,11 @@ ValueFromPipelineByPropertyName=$true)]
         
         try{
             if($creds){
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -Credential $creds -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -Credential $creds -UseBasicParsing -SkipCertificateCheck
             }else{
                 #Sets the token header
                 $header = @{"X-API-Token" = "$token"}
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method GET -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
             }
         }catch [System.Net.WebException] {
                 $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))

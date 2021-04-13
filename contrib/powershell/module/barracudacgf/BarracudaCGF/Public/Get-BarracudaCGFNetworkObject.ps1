@@ -27,7 +27,7 @@ ValueFromPipelineByPropertyName=$false)]
 [string] $token,
 
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
-$creds,
+[SecureString]$creds,
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
@@ -98,7 +98,7 @@ ValueFromPipelineByPropertyName=$true)]
     }
 
         #Sets the token header
-    $header = @{"X-API-Token" = "$token"}
+   # $header = @{"X-API-Token" = "$token"}
 
     #Inserts the tail of the API path to the parameters 
     $PSBoundParameters["context"] = "objects/networks"
@@ -124,10 +124,10 @@ ValueFromPipelineByPropertyName=$true)]
     }else{
         try{
 			if($creds){
-		        $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method Get -Headers $header -Credential $creds -UseBasicParsing 
+		        $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method Get -Headers $header -Credential $creds -UseBasicParsing -SkipCertificateCheck
             }else{
-                $header = @{"X-API-Token" = "$token"}
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method Get -Headers $header -UseBasicParsing
+                $header = @{"X-API-Token" = "$($token | ConvertFrom-SecureString -AsPlainText)"}             
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method Get -Headers $header -UseBasicParsing -SkipCertificateCheck
             }
             if((ConvertFrom-Json $results.Content).objects){
 		        return (ConvertFrom-Json $results.Content).objects

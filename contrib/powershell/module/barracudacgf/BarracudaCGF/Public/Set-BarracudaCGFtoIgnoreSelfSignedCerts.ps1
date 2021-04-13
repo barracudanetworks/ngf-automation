@@ -1,3 +1,8 @@
+#This may be needed for Version 5 and below powershell which is not recommended to be used. The module would need modifying to work with that version as it is now written for 7.x powershell.  
+#This needs to be ran at the start to set the environment to support Tls1.2 and to allow self signed certificates.
+#Further for each command in Public folder the -SkipCertificateCheck would need removing from the end of Invoke-WebRequest command. 
+
+
 Function Set-BarracudaCGFtoIgnoreSelfSignedCerts{
 [cmdletbinding()]
 param(

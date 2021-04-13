@@ -51,10 +51,10 @@ $subject,
 
 	try{
         if($creds){
-		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/$($subject)" -Method GET -Headers $header -Credential $creds -UseBasicParsing 
+		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/$($subject)" -Method GET -Headers $header -Credential $creds -UseBasicParsing -SkipCertificateCheck
         }else{
             $header = @{"X-API-Token" = "$token"}
-            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/$($subject)" -Method GET -Headers $header -UseBasicParsing 
+            $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/$($subject)" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
         }
 	}catch{
 		Write-Error("Unable to Login to API http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/$($subject) due to " + $_.Exception)

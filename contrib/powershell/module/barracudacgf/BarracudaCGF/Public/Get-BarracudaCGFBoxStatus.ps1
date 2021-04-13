@@ -37,10 +37,10 @@ $creds,
 
 	try{
         if($creds){
-		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box" -Method GET -Headers $header -Credential $creds -UseBasicParsing 
+		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box" -Method GET -Headers $header -Credential $creds -UseBasicParsing -SkipCertificateCheck
         }else{
             $header = @{"X-API-Token" = "$token"}
-		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box" -Method GET -Headers $header -UseBasicParsing 
+		    $results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck
         }
 	}catch [System.Net.WebException] {
                 $Error[0] | Get-ExceptionResponse

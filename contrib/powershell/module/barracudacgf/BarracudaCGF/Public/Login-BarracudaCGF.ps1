@@ -16,7 +16,7 @@ ValueFromPipelineByPropertyName=$false)]
 
 [Parameter(Mandatory=$true,
 ValueFromPipelineByPropertyName=$false)]
-[string] $password,
+$password,
 
 [Parameter(Mandatory=$false,
 ValueFromPipelineByPropertyName=$true)]
@@ -48,7 +48,7 @@ ValueFromPipelineByPropertyName=$false)]
     
     $postParams = @{}
     $postParams.Add("username",$name)
-    $postParams.Add("password",$comments)
+    $postParams.Add("password",$password)
     
     $data = ConvertTo-Json $postParams -Depth 99
     
@@ -66,7 +66,7 @@ ValueFromPipelineByPropertyName=$false)]
     }else{
         
             try{
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing 
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
             }catch [System.Net.WebException] {
                     $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                     Write-Error $results

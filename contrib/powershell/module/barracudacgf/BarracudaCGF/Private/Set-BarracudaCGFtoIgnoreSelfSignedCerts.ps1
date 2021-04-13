@@ -34,7 +34,7 @@ public static class Dummy {
 
 
 
-	#	[Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+		[Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
 	}
 	if($noCRL){
 	#May be required to ignore CRLs

@@ -31,7 +31,7 @@ param(
     $header = @{"X-API-Token" = "$token"}
 
 	try{
-		$results =Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/tips" -Method GET -Headers $header -UseBasicParsing 
+		$results = Invoke-WebRequest -Uri "http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/tips" -Method GET -Headers $header -UseBasicParsing -SkipCertificateCheck 
 	}catch{
 		Write-Error("Unable to Login to API http$($s)://$($deviceName):$($devicePort)/rest/control/v1/box/tips due to " + $_.Exception)
 	}

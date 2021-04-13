@@ -400,7 +400,7 @@ ValueFromPipelineByPropertyName=$true)]
 
         
         try{
-               $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing
+               $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method POST -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
         }catch [System.Net.WebException] {
                 $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                 Write-Error $results

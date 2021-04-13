@@ -230,7 +230,6 @@ def main():
 					else:
 						logger.warning("failure to get status from webhook:" + webhook)
 			
-			
 			#If this is the 5th loop or if the webhook is successful then stops the
 			#loop condition being true
 			if (loopnum == 5):

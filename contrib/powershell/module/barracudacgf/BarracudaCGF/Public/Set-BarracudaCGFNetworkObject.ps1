@@ -173,8 +173,7 @@ Function Set-BarracudaCGFNetworkObject {
     $postParams.Add("included",$includedObjects)
     
     #Converts to JSON
-    $data = ConvertTo-Json $postParams -Depth 99
-    
+    $data = ConvertTo-Json $postParams -Depth 99 
     
     #Sets the token header
     $header = @{"X-API-Token" = "$token"}
@@ -195,7 +194,7 @@ Function Set-BarracudaCGFNetworkObject {
 
         
             try{
-                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method PUT -Headers $header -Body $data -UseBasicParsing
+                $results = Invoke-WebRequest -Uri $url -ContentType 'application/json' -Method PUT -Headers $header -Body $data -UseBasicParsing -SkipCertificateCheck
             }catch [System.Net.WebException] {
                     $results = [system.String]::Join(" ", ($_ | Get-ExceptionResponse))
                     Write-Error $results

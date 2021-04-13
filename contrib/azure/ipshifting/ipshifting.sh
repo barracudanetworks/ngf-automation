@@ -76,8 +76,8 @@ then
     echo "`date +"%Y-%m-%d %T"` - This VM is $VM" >> $LOG 2>&1
     RG=$(curl -sH Metadata:true "http://169.254.169.254/metadata/instance/compute/resourceGroupName?api-version=2021-01-01&format=text")
     echo "`date +"%Y-%m-%d %T"` - Current Resource Group: $RG" >> $LOG 2>&1
+    #Logs into Azure with the managed identity
     az login --identity >> $LOG 2>&1
-    #SPID=$(az resource list -n $VM --query [*].identity.principalId --out tsv)
 
     #Collects NIC info for both boxes
     NICID=$(az vm show --name $VM -g $RG --query 'networkProfile.networkInterfaces[0].id' -o tsv)
@@ -102,13 +102,13 @@ then
   while [ "$RESULT" != "$PIP" ]
     do
         #removed the IP from the otehr boxes NIC 
-        #az network nic ip-config update --name $IPCONFIG --nic-name $NIC --resource-group $RG --remove "publicIpAddress"
+        
         echo "`date +"%Y-%m-%d %T"` - Disassociate PIP on $IPCONFIG from $OTHERNIC " >> $LOG 2>&1
 
         az network nic ip-config update --name $IPCONFIG --nic-name $OTHERNIC --resource-group $RG --remove "publicIpAddress" >> $LOG 2>&1
 
         echo "`date +"%Y-%m-%d %T"` - Associate $PIP on $IPCONFIG from $NIC " >> $LOG 2>&1
-        #az network nic ip-config update --name $IPCONFIG --nic-name $OTHERNIC --resource-group $RG --public-ip-address $PIP
+        
         az network nic ip-config update --name $IPCONFIG --nic-name $NIC --resource-group $RG --public-ip-address $PIP >> $LOG 2>&1
         
         #if a second PIP is provided then attempts to switch that onto the no longer active box.

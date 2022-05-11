@@ -65,8 +65,8 @@ CONFPATH="/opt/phion/config/active/"
         IP=$(az network nic ip-config list -g $RG --nic-name $NIC --query "[?name=='$NAME'].privateIpAddress" -o tsv)
         echo $IP
 
-    echo "$CONFPATHexternal.boxnet_altip_$NAME.conf" >> $LOG 2>&1
-    echo "IP=$IP" > "$CONFPATHexternal.boxnet_altip_$NAME.conf" 
+    echo "${CONFPATH}external.boxnet_altip_${NAME}.conf" >> $LOG 2>&1
+    echo "IP=$IP" > "${CONFPATH}external.boxnet_altip_${NAME}.conf" 
     echo "Updated network object $FW ruleset to $IP via API " >> $LOG 2>&1
 
     done

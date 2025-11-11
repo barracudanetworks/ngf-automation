@@ -39,7 +39,7 @@ param(
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
 [string]$storageAccountResourceGroupName = '',
 
-# Enter to use a User Defined VM image E.g., https://docstorage0.blob.core.windows.net/vhds/GWAY-6.2.0-216-Azure.vhd
+# Enter to use a User Defined VM image E.g., https://docstorage0.blob.core.windows.net/vhds/GWAY-8.3.3-0238-Azure-VFCx.vhd
 # Leave empty to use the latest image from the Azure Marketplace
 #$customSourceImageUri = 'https://yourstorage.blob.core.windows.net/vhd-container/yourVHDNAME.vhd'
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
@@ -65,11 +65,10 @@ param(
 
 #Set the version to be deployed #latest
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
-[ValidateSet("latest", "8.0.2011901", "8.0.1037602","8.0.0047504","7.2.5013201")]
+[ValidateSet("latest", "10.0.0099302", "9.0.5026801","8.3.3023801")]
 [string]$cgfVersion = "latest",
 #You can review the versions available using the below command
 #Get-AzVMImage -Location $location -PublisherName "barracudanetworks" -Offer $vmProductType -Skus $vmLicenseType
-
 
 #Set the version to be deployed #latest
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
@@ -118,8 +117,8 @@ param(
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
 [string]$vmPrefix = '', #,
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
-[ValidateSet("Standard_DS1_v2","Standard_DS2_v2","Standard_DS3_v2","Standard_DS4_v2","Standard_DS5_v2","Standard_D1_v2","Standard_D2_v2","Standard_D3_v2","Standard_D4_v2","Standard_D5_v2","Standard_F2s_v2","Standard_F4s_v2","Standard_F8s_v2")]
-[string]$vmSize = 'Standard_DS1_v2',
+[ValidateSet("Standard_F1s","Standard_F2s","Standard_F4s","Standard_F8s","Standard_F1s_v2","Standard_F2s_v2","Standard_F4s_v2","Standard_F8s_v2","Standard_D2s_v5","Standard_D4s_v5","Standard_D8s_v5")]
+[string]$vmSize = 'Standard_F1s',
 #Set data disk size and qty
 # size of a single data disk size in GB. Multiply the size by the number of disks to received the total disk size of the RAID device
 [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
@@ -172,15 +171,6 @@ $ilb2Name = '{0}-ILB-2' -f $vmPrefix
 $elbName = '{0}-ELB' -f $vmPrefix
 $nsgName = '{0}-NSG' -f $vmPrefix
 
-
-
-$moduleversion = (Get-InstalledModule -Name "Az").Version
-if(!$moduleversion){
-    if(Get-InstalledModule -Name "AzureRM"){ Write-Host "This script is for the Az module. But you seem to have the AzureRM installed. Please use the other script"}
-}else{
-    Write-Verbose "Running Script for Az module version $($moduleversion.ToString())"
-}
-
 #############################################
 #
 # From this point the script will create the resources as determined by the variables completed above.
@@ -191,14 +181,13 @@ Write-Host "Logging into Azure"
 
 if($enableProgramatic){
     Write-Host "Enabling programatic deployment for $($vmProductType)"
-    Get-AzMarketplaceTerms -Publisher "barracudanetworks" -Product $vmProductType -Name "byol" | Set-AzMarketplaceTerms -Accept
+    Get-AzMarketplaceTerms -Name $vmLicenseType -Product $vmProductType -Publisher "barracudanetworks"
+    Set-AzMarketplaceTerms -Name $vmLicenseType -Product $vmProductType -Publisher "barracudanetworks" -Accept
 }
-
-
 
 if($acceleratedNetworking){
 
-    if((Get-AzVMSize -Location "$($location)" | Where-Object -Property Name -EQ -Value "$($vmSize)").NumberOfCores -le 1){
+    if((Get-AzComputeResourceSku -Location "$($location)" | Where-Object -Property Name -EQ -Value "$($vmSize)").NumberOfCores -le 1){
         $acceleratedNetworking = $false
         Write-Host "Accelerated Networking disabled as VM deployment size $($vmSize) is 1 cores"
     }
@@ -282,9 +271,6 @@ if($enableSSH){
     }
 }
 
-
-
-
 Write-Verbose 'Creating Availability Set'
 if(!$vmAvSetName){
     Write-Host "No Availabity Set required"
@@ -345,7 +331,7 @@ $vmVersion = $cgfVersion
      }
 }else{
 $vmVersion = $wafVersion
-	#Deploy's a load balancer with the public IP assigned to it
+	#Deploys a load balancer with the public IP assigned to it
     Write-Verbose 'Creating Public Load Balancer'
 	$pip = New-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Location $location -Name $ipName -DomainNameLabel $domName -AllocationMethod Static -Sku $lbSku 
     
@@ -364,8 +350,7 @@ $vmVersion = $wafVersion
     
 }
 
-
-#Creates the NSG's
+#Creates the NSGs
 Write-Verbose 'Creating Network Security Groups'
 
 if($vmProductType -ne "waf"){
@@ -386,10 +371,7 @@ if($vmProductType -ne "waf"){
 
 }
 
-
-
 #The items created above are shared, below are the unique VM and NIC creations.
-
 
 For($vmNum=$quantity; $vmNum -ge 1; $vmNum--){
 
@@ -402,11 +384,7 @@ $ipName = Invoke-Command $ipNamedef
 $diskName = Invoke-Command $diskNamedef
 }else{
 
-
 }
-
-
-
     if($vmProductType -ne "waf"){
         if($vmAvZone){
             $pip = New-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Location $location -Name $ipName -AllocationMethod Static -Sku $lbSku -Zone $vmNum
@@ -422,8 +400,8 @@ $diskName = Invoke-Command $diskNamedef
 		    #When deploying a WAF adds the interface into the Load Balancers Backend pool and NAT Rules
 		    $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId -LoadBalancerBackendAddressPoolId $BackendPool.Id -LoadBalancerInboundNatRuleId $natRule1.Id, $natRule2.Id -NetworkSecurityGroupId $nsg.id
 	    }elseif($vmProductType -eq "barracuda-ng-cc"){
-            #Bulids CC as standalone, builds FW's with assumption of clustering
-		    $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId -PublicIpAddressId $pip.id -NetworkSecurityGroupId $nsg.id
+            #Builds CC as standalone, builds FW's with assumption of clustering
+            $nic = New-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Location $location -Name $nicName -SubnetId $SubnetId -PublicIpAddressId $pip.id -NetworkSecurityGroupId $nsg.id 
         }else{
             
             if($quantity -eq 2 -and $vmNum -eq 1){
@@ -495,17 +473,13 @@ $diskName = Invoke-Command $diskNamedef
 
         }
     
-
-
-
-
     # Create the VM Configuration
 
-    Write-Verbose 'Creating CGF VM Configuration'
+    Write-Verbose 'Creating VM Configuration'
     if($vmAvZone){
-        $vm = New-AzVMConfig -VMName $vmName -VMSize $vmSize -Zone $vmNum
+        $vm = New-AzVMConfig -VMName $vmName -VMSize $vmSize -Zone $vmNum     
     }elseif($vmAvSetName){
-        $vm = New-AzVMConfig -VMName $vmName -VMSize $vmSize -AvailabilitySetId $vmAvSet.Id
+        $vm = New-AzVMConfig -VMName $vmName -VMSize $vmSize -AvailabilitySetId $vmAvSet.Id 
     }else{
         $vm = New-AzVMConfig -VMName $vmName -VMSize $vmSize
     }
@@ -517,15 +491,14 @@ $diskName = Invoke-Command $diskNamedef
     }elseif($quantity -eq 2 -and $vmNum -eq 2 -and $cgfcustomData2){
         $vm = Set-AzVMOperatingSystem -VM $vm -Linux -ComputerName $vmName -Credential $cred -CustomData $cgfCustomData2 -ErrorAction Stop
     }else{
-
+   
         $vm = Set-AzVMOperatingSystem -VM $vm -Linux -ComputerName $vmName -Credential $cred -CustomData $cgfCustomData -ErrorAction Stop
+       
     }
-
-    
-
+  
     # Add primary network interface
     $vm = Add-AzVMNetworkInterface -VM $vm -Id $nic.Id -ErrorAction Stop -Primary 
-
+ 
     # If the second NIC was created earlier this will be associated to the VM here.
     if($nic2){
 	    $vm = Add-AzVMNetworkInterface -VM $vm -Id $nic2.Id -ErrorAction Stop 
@@ -538,18 +511,17 @@ $diskName = Invoke-Command $diskNamedef
         $osDiskUri = '{0}vhds/{1}{2}.vhd' -f $storageAccount.PrimaryEndpoints.Blob.ToString(), $vmName.ToLower(), $diskName
     }
 
-
-
     # Specify the OS disk with user image
     if ($customSourceImageUri -eq '')
     {
-        Write-Verbose 'Using $($VmVersion) image from the Azure Marketplace'
+        
         $vm.Plan = @{'name'= $vmLicenseType; 'publisher'= 'barracudanetworks'; 'product' = $vmProductType}
         $vm = Set-AzVMSourceImage -VM $vm -PublisherName 'barracudanetworks' -Skus $vmLicenseType -Offer $vmProductType -Version $vmVersion -ErrorAction Stop
         
     
         if($useManagedDisks){
-            $vm = Set-AzVMOSDisk -VM $vm -Name $diskName -StorageAccountType $storageType -DiskSizeInGB 128 -CreateOption FromImage
+            
+            $vm = Set-AzVMOSDisk -VM $vm -Name $diskName -StorageAccountType $storageType -DiskSizeInGB 250 -CreateOption FromImage
         }else{
             # Set the name and storage for the OS Disk image.
             $vm = Set-AzVMOSDisk -VM $vm -Name $diskName -VhdUri $osDiskUri -CreateOption fromImage
@@ -559,9 +531,11 @@ $diskName = Invoke-Command $diskNamedef
     {
         Write-Verbose ('Using user defined image {0}' -f $customSourceImageUri)
         if(!$useManagedDisks){
+           
             # Set the name and storage for the OS Disk image.
             $vm = Set-AzVMOSDisk -VM $vm -Name $diskName -VhdUri $osDiskUri -CreateOption fromImage -SourceImageUri $customSourceImageUri -Linux 
         }else{
+            
              $image.StorageProfile.OsDisk.StorageAccountType = $storageType
              $vm =  Set-AzVMSourceImage -VM $vm -Id $image.Id
         }
@@ -582,36 +556,35 @@ $diskName = Invoke-Command $diskNamedef
             $datadiskName = Invoke-Command $datadiskNameDef
             $dataDiskUri = '{0}vhds/{1}{2}.vhd' -f $storageAccount.PrimaryEndpoints.Blob.ToString(), $vmName.ToLower(), $datadiskName
             $vm = Add-AzVMDataDisk -VM $vm -Name $datadiskName1 -DiskSizeInGB $datadisksize -CreateOption Empty -Lun $diskNum -VhdUri $dataDiskUri
-        }
-        
-      
+        } 
     }
-
 
     Write-Verbose 'Creating Barracuda Cloud Gen Firewall VM. This can take a while ....'
     #pause
-    $result = New-AzVM -ResourceGroupName $ResourceGroupName -Location $location -VM $vm 
+    $result = New-AzVM -ResourceGroupName $ResourceGroupName -Location $location -VM $vm
 
     #Updates LB pools after provisioning of VM
+   
+   if ($quantity -gt 1){
     if($lbSku -eq "Standard" -and !$nicName2){
          $nic | Set-AzNetworkInterfaceIpConfig -Name ipconfig1 -LoadBalancerBackendAddressPoolId $BackendPool.Id,$intBackendPool.Id -PublicIpAddressId $pip.Id | Set-AzNetworkInterface -OutVariable $setnic | Out-Null
     }else{
         $nic | Set-AzNetworkInterfaceIpConfig -Name ipconfig1 -LoadBalancerBackendAddressPoolId $BackendPool.Id -PublicIpAddressId $pip.Id | Set-AzNetworkInterface -OutVariable $setnic | Out-Null
         $nic2 | Set-AzNetworkInterfaceIpConfig -Name ipconfig1 -LoadBalancerBackendAddressPoolId $intBackendPool.Id | Set-AzNetworkInterface -OutVariable $setnic | Out-Null
     }
+   }
 
     if($result.IsSuccessStatusCode -eq 'True') {
        #$result
         if($vmProductType -eq 'waf'){
             Write-Output ('Barracuda CGF WAF VM ''{0}'' was successfully deployed.  Connect to the firewall at http://{2}:8001 with the username: admin and password: {1}' -f $vmName, $rootPassword, (Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $ipName).IpAddress)
         }else{
-            Write-Output ('Barracuda CGF Firewall VM ''{0}'' was successfully deployed.  Connect to the firewall at {2} with the username: root or and password: {1}' -f $vmName, $rootPassword, (Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $ipName).IpAddress)
+            Write-Output ('Barracuda CGF Firewall VM ''{0}'' was successfully deployed.  Connect to the firewall at {2} with the username: root and password: {1}' -f $vmName, $rootPassword, (Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -Name $ipName).IpAddress)
 
         }
 
     } else {
         Write-Host ('Deployment Failed. {0}' -f $result.ReasonPhrase)
     }
-
-
+    
 } #End For loop that can create clusters.
